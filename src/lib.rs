@@ -93,11 +93,3 @@ impl Generator {
         format!(include_str!("object.h"), object = object.ty.identifier.name, methods = methods)
     }
 }
-
-#[cfg(test)]
-mod tests {
-    #[test]
-    fn it_works() {
-        assert_eq!(2 + 2, 4);
-    }
-}
