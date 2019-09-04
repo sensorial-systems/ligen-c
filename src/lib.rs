@@ -11,7 +11,13 @@ impl Generator {
     pub fn generate(&self, object: &Object) -> Files {
         let path = format!("c/include/{object}.h", object = object.ty.identifier.name);
         let object = self.generate_object(&object);
-        Files::from(vec![File::new(path, object)])
+        let object = File::new(path, object);
+
+        let path = format!("c/include/RustObject.h");
+        let rust_object = String::from(include_str!("RustObject.h"));
+        let rust_object = File::new(path, rust_object);
+
+        Files::from(vec![rust_object, object])
     }
 
     pub fn generate_ty(&self, ty : &Type) -> String {
@@ -29,7 +35,7 @@ impl Generator {
                 "f64" => "double",
                 _ => "#ERROR_GENERATING_ATOMIC_TYPE"
             }.to_string(),
-            false => String::from("void*")
+            false => String::from("RustObject")
         }
     }
 
@@ -76,9 +82,9 @@ impl Generator {
             parameters
         } else {
             if parameters.len() > 0 {
-                format!("void* self, {}", parameters)
+                format!("RustObject self, {}", parameters)
             } else {
-                format!("void* self")
+                format!("RustObject self")
             }
         };
         format!(include_str!("method.h"), return_type = return_type, function_identifier = function_identifier, parameters = parameters)
