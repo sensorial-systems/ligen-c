@@ -16,6 +16,9 @@ impl TypeGenerator {
                 "i8" => "int8_t",
                 "f32" => "float",
                 "f64" => "double",
+                "bool" => "bool",
+                "usize" => "size_t",
+                "isize" => "size_t",
                 _ => "#ERROR_GENERATING_ATOMIC_TYPE"
             }
         } else {
@@ -30,6 +33,9 @@ impl TypeGenerator {
                 "i8" => "char",
                 "f32" => "float",
                 "f64" => "double",
+                "bool" => "bool",
+                "usize" => "unsigned int",
+                "isize" => "int",
                 _ => "#ERROR_GENERATING_ATOMIC_TYPE"
             }
         }
@@ -39,19 +45,25 @@ impl TypeGenerator {
         Type::new(false, Identifier::new("void"), false)
     }
 
-    pub fn generate(ty : &ligen_core::Type, sized_integer : bool) -> Type {
-        let constness = if let Some(reference) = &ty.reference {
-            !reference.is_mutable && !ty.is_atomic()
-        } else {
-            false
+    pub fn generate(typ : &ligen_core::Type, sized_integer : bool) -> Type {
+        let constness = match &typ.modifier {
+            ligen_core::TypeModifier::Pointer(reference) => !reference.is_mutable,
+            ligen_core::TypeModifier::Reference(reference) => !reference.is_mutable && !typ.is_atomic(),
+            ligen_core::TypeModifier::None => false
         };
 
-        if ty.is_atomic() {
-            let name = TypeGenerator::translate_atomic(&ty.identifier.name, sized_integer);
+        let pointer = match &typ.modifier {
+            ligen_core::TypeModifier::Reference(_) => true,
+            ligen_core::TypeModifier::Pointer(_) => true,
+            ligen_core::TypeModifier::None => false
+        };
+
+        if typ.is_atomic() {
+            let name = TypeGenerator::translate_atomic(&typ.identifier.name, sized_integer);
             let identifier = Identifier::new(name);
-            Type::new(constness, identifier, !ty.is_atomic())
+            Type::new(constness, identifier, pointer)
         } else {
-            Type::new(constness, Identifier::new(&ty.identifier.name), false)
+            Type::new(constness, Identifier::new(&typ.identifier.name), pointer)
         }
     }
 }

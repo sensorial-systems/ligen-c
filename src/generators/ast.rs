@@ -8,6 +8,8 @@ impl ASTGenerator {
         let mut statements = Vec::new();
         statements.push(Statement::Macro(Macro::new(Identifier::new("pragma"), "once")));
         if sized_integer { statements.push(Statement::Macro(Macro::new(Identifier::new("include"), "<stdint.h>"))); }
+        statements.push(Statement::Macro(Macro::new(Identifier::new("include"), "<stdbool.h>")));
+        for dependency in &object.dependencies { statements.push(Statement::Macro(Macro::new(Identifier::new("include"), &format!("<{}.h>", dependency.name)))); }
         statements.push(Statement::Macro(Macro::new(Identifier::new("ifdef"), "__cplusplus")));
         statements.push(Statement::Uncategorized(String::from("extern \"C\" {")));
         statements.push(Statement::Macro(Macro::new(Identifier::new("endif"), "")));
