@@ -56,7 +56,7 @@ impl TypeGenerator {
             ligen_core::TypeModifier::Reference(_) => true,
             ligen_core::TypeModifier::Pointer(_) => true,
             ligen_core::TypeModifier::None => false
-        };
+        } && typ.is_atomic();
 
         if typ.is_atomic() {
             let name = TypeGenerator::translate_atomic(&typ.identifier.name, sized_integer);
