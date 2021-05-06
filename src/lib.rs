@@ -8,5 +8,11 @@
 #![warn(unused_qualifications)]
 
 use ligen::ligen;
+use proc_macro::TokenStream;
 
 pub mod ast;
+
+#[proc_macro_attribute]
+pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
+    todo!()
+}
