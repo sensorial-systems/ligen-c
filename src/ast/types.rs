@@ -13,6 +13,16 @@ pub enum Atomic {
     LongInt,
     /// LongLongInt variant
     LongLongInt,
+    /// UnsignedChar variant
+    UnsignedChar,
+    /// UnsignedShort variant
+    UnsignedShort,
+    /// UnsignedInt variant
+    UnsignedInt,
+    /// UnsignedLongInt variant
+    UnsignedLongInt,
+    /// UnsignedLongLongInt variant
+    UnsignedLongLongInt,
     /// Float variant
     Float,
     /// Dobule variant
@@ -34,8 +44,6 @@ pub enum Types {
 pub struct Const;
 #[derive(Debug)]
 pub struct Ref;
-#[derive(Debug)]
-pub struct Sign;
 
 #[derive(Debug)]
 /// Type Struct
@@ -46,23 +54,15 @@ pub struct Type {
     type_: Types,
     /// reference field
     reference: Option<Ref>,
-    /// signed field
-    signed: Option<Sign>,
 }
 
 impl Type {
     /// Function to create a new Type
-    pub fn new(
-        constness: Option<Const>,
-        type_: Types,
-        reference: Option<Ref>,
-        signed: Option<Sign>,
-    ) -> Type {
+    pub fn new(constness: Option<Const>, type_: Types, reference: Option<Ref>) -> Type {
         Type {
             constness,
             type_,
             reference,
-            signed,
         }
     }
 }
@@ -72,16 +72,11 @@ impl fmt::Display for Type {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(
             f,
-            "{}{}{}{}",
+            "{}{}{}",
             if let Some(_) = self.constness {
                 "const "
             } else {
                 ""
-            },
-            if let Some(_) = self.signed {
-                "signed "
-            } else {
-                "unsigned "
             },
             match &self.type_ {
                 Types::Atomic(atomic) => {
@@ -94,6 +89,11 @@ impl fmt::Display for Type {
                         Atomic::Float => "float",
                         Atomic::Double => "double",
                         Atomic::LongDouble => "long double",
+                        Atomic::UnsignedChar => "unsigned char",
+                        Atomic::UnsignedShort => "unsigned short",
+                        Atomic::UnsignedInt => "unsigned int",
+                        Atomic::UnsignedLongInt => "unsigned long int",
+                        Atomic::UnsignedLongLongInt => "unsigned long long int",
                     }
                 }
                 Types::Compound(identifier) => identifier.name.as_str(),
@@ -109,16 +109,52 @@ impl fmt::Display for Type {
 
 #[cfg(test)]
 mod test {
-    use super::{Atomic, Const, Ref, Sign, Type, Types};
+    use super::{Atomic, Const, Ref, Type, Types};
 
     #[test]
-    fn ast_type() {
-        let ty = Type::new(
-            Some(Const),
-            Types::Atomic(Atomic::Int),
-            Some(Ref),
-            Some(Sign),
-        );
-        assert_eq!("const signed int*", format!("{}", ty));
+    fn ast_type_atomic() {
+        let types: Vec<Type> = vec![
+            Atomic::Char,
+            Atomic::Short,
+            Atomic::Int,
+            Atomic::LongInt,
+            Atomic::LongLongInt,
+            Atomic::Float,
+            Atomic::Double,
+            Atomic::LongDouble,
+            Atomic::UnsignedChar,
+            Atomic::UnsignedShort,
+            Atomic::UnsignedInt,
+            Atomic::UnsignedLongInt,
+            Atomic::UnsignedLongLongInt,
+        ]
+        .into_iter()
+        .map(|atomic| Type::new(Some(Const), Types::Atomic(atomic), Some(Ref)))
+        .collect();
+
+        let expected: Vec<String> = vec![
+            "char",
+            "short",
+            "int",
+            "long int",
+            "long long int",
+            "float",
+            "double",
+            "long double",
+            "unsigned char",
+            "unsigned short",
+            "unsigned int",
+            "unsigned long int",
+            "unsigned long long int",
+        ]
+        .into_iter()
+        .map(|ty| format!("const {}*", ty))
+        .collect();
+
+        let mut iter = types.iter().zip(expected.iter());
+
+        while let Some((value, expected_value)) = iter.next() {
+            assert_eq!(format!("{}", value), *expected_value);
+        }
     }
 }
