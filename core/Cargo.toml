@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 ligen-core = { version = "0.1.7", path = "../../ligen/core" }
 proc-macro2 = "1.0.26"
+quote = "1.0.9"
