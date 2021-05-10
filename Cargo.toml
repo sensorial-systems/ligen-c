@@ -5,9 +5,7 @@ authors = ["Danilo Guanabara <danguafer@gmail.com>"]
 edition = "2018"
 
 [lib]
-crate-type = ["dylib"]
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+proc-macro = true
 
 [dependencies]
 ligen = { path = "../ligen" }
