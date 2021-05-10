@@ -1,3 +1,5 @@
+//! C Binding Generator.
+
 #![warn(missing_copy_implementations)]
 #![warn(missing_debug_implementations)]
 #![warn(missing_docs)]
@@ -7,12 +9,7 @@
 #![warn(unused_import_braces)]
 #![warn(unused_qualifications)]
 
-// use ligen_core::
-
 pub mod ast;
 
-use proc_macro2::TokenStream;
-
-pub fn ligen_c(_args: TokenStream, input: TokenStream) -> TokenStream {
-    input
-}
+mod proc_macro;
+pub use proc_macro::ligen_c;
