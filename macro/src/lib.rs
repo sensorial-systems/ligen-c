@@ -7,13 +7,10 @@
 #![warn(unused_import_braces)]
 #![warn(unused_qualifications)]
 
-use ligen::ligen;
 use proc_macro::TokenStream;
 
-pub(crate) mod ast;
-
-#[proc_macro_attribute]
 /// Entry point for ligen_c
+#[proc_macro_attribute]
 pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
-    todo!()
+    ligen_c_core::ligen_c(args.into(), input.into()).into()
 }
