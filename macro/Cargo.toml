@@ -8,4 +8,5 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-ligen-c-core = { version = "0.1.0", path = "../core" }
+ligen-c-core = { git = "https://github.com/sensorial-systems/ligen-c/", branch = "main" }
+

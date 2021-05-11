@@ -40,10 +40,13 @@ pub enum Types {
     Compound(Identifier),
 }
 
-#[derive(Debug)]
+/// Constant.
+#[derive(Debug, Clone, Copy)]
 pub struct Const;
-#[derive(Debug)]
-pub struct Ref;
+
+/// Pointer.
+#[derive(Debug, Clone, Copy)]
+pub struct Pointer;
 
 #[derive(Debug)]
 /// Type Struct
@@ -52,17 +55,17 @@ pub struct Type {
     constness: Option<Const>,
     /// type_ field
     type_: Types,
-    /// reference field
-    reference: Option<Ref>,
+    /// pointer field
+    pointer: Option<Pointer>,
 }
 
 impl Type {
     /// Function to create a new Type
-    pub fn new(constness: Option<Const>, type_: Types, reference: Option<Ref>) -> Type {
+    pub fn new(constness: Option<Const>, type_: Types, pointer: Option<Pointer>) -> Type {
         Type {
             constness,
             type_,
-            reference,
+            pointer,
         }
     }
 }
@@ -98,18 +101,14 @@ impl fmt::Display for Type {
                 }
                 Types::Compound(identifier) => identifier.name.as_str(),
             },
-            if let Some(_) = self.reference {
-                "*"
-            } else {
-                ""
-            }
+            if let Some(_) = self.pointer { "*" } else { "" }
         )
     }
 }
 
 #[cfg(test)]
 mod test {
-    use super::{Atomic, Const, Ref, Type, Types};
+    use super::{Atomic, Const, Pointer, Type, Types};
 
     #[test]
     fn ast_type_atomic() {
@@ -129,7 +128,7 @@ mod test {
             Atomic::UnsignedLongLongInt,
         ]
         .into_iter()
-        .map(|atomic| Type::new(Some(Const), Types::Atomic(atomic), Some(Ref)))
+        .map(|atomic| Type::new(Some(Const), Types::Atomic(atomic), Some(Pointer)))
         .collect();
 
         let expected: Vec<String> = vec![

@@ -9,3 +9,4 @@ edition = "2018"
 [dependencies]
 ligen-core = "0.1.7"
 proc-macro2 = "1.0.26"
+quote = "1.0.9"
