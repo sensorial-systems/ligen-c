@@ -55,17 +55,17 @@ pub struct Type {
     constness: Option<Const>,
     /// type_ field
     type_: Types,
-    /// reference field
-    reference: Option<Pointer>,
+    /// pointer field
+    pointer: Option<Pointer>,
 }
 
 impl Type {
     /// Function to create a new Type
-    pub fn new(constness: Option<Const>, type_: Types, reference: Option<Pointer>) -> Type {
+    pub fn new(constness: Option<Const>, type_: Types, pointer: Option<Pointer>) -> Type {
         Type {
             constness,
             type_,
-            reference,
+            pointer,
         }
     }
 }
@@ -101,11 +101,7 @@ impl fmt::Display for Type {
                 }
                 Types::Compound(identifier) => identifier.name.as_str(),
             },
-            if let Some(_) = self.reference {
-                "*"
-            } else {
-                ""
-            }
+            if let Some(_) = self.pointer { "*" } else { "" }
         )
     }
 }
