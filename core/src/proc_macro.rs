@@ -1,24 +1,17 @@
 //! proc-macro entrypoint.
 
-use ligen_core::ir::{
-    Attributes, Identifier, Implementation,
-    ImplementationItem::{Constant, Method},
+use ligen_core::{
+    ir::{
+        Attributes, Identifier, Implementation,
+        ImplementationItem::{Constant, Method},
+    },
+    utils::Logger,
 };
 
 use std::convert::TryFrom;
 
 use proc_macro2::TokenStream;
 use quote::{quote, ToTokens, TokenStreamExt};
-use std::fmt::Display;
-
-//TODO: Move to ligen_core
-pub struct Logger {}
-
-impl Logger {
-    pub fn log<D: Display>(d: D) {
-        println!("{}", d);
-    }
-}
 
 /// Generator entry point
 pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
