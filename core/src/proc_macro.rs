@@ -1,7 +1,10 @@
 //! proc-macro entrypoint.
 
 use crate::generator::ExternGenerator;
-use ligen_core::ir::Attributes;
+use ligen_core::{
+    ir::{Attributes, Implementation},
+    utils::Logger,
+};
 use proc_macro2::TokenStream;
 use quote::{quote, TokenStreamExt};
 use std::convert::TryFrom;
@@ -10,9 +13,10 @@ use std::convert::TryFrom;
 pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
     let _attributes = Attributes::try_from(args).expect("Couldn't get attributes.");
     let mut output = input.clone();
-    let externs = ExternGenerator::generate(input);
-    if let Some(generated) = externs {
-        output.append_all(generated)
+    if let Ok(implementation) = Implementation::try_from(input) {
+        output.append_all(ExternGenerator::generate(implementation))
+    } else {
+        Logger::log("Not supported.");
     }
 
     quote! {#output}
