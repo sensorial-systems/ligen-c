@@ -1,5 +1,45 @@
 use crate::ast::Identifier;
 
+#[derive(Debug, PartialEq, Copy, Clone)]
+/// Atomic Enum
+pub enum Atomic {
+    /// Char variant
+    Char,
+    /// Short variant
+    Short,
+    /// Int variant
+    Int,
+    /// LongInt variant
+    LongInt,
+    /// LongLongInt variant
+    LongLongInt,
+    /// UnsignedChar variant
+    UnsignedChar,
+    /// UnsignedShort variant
+    UnsignedShort,
+    /// UnsignedInt variant
+    UnsignedInt,
+    /// UnsignedLongInt variant
+    UnsignedLongInt,
+    /// UnsignedLongLongInt variant
+    UnsignedLongLongInt,
+    /// Float variant
+    Float,
+    /// Dobule variant
+    Double,
+    /// LongDouble variant
+    LongDouble,
+}
+
+#[derive(Debug, PartialEq)]
+/// Types Enum
+pub enum Types {
+    /// Atomic variant
+    Atomic(Atomic),
+    /// Compound variant
+    Compound(Identifier),
+}
+
 /// Constant.
 #[derive(Debug, Clone, Copy)]
 pub struct Const;
@@ -14,14 +54,14 @@ pub struct Type {
     /// constness field
     constness: Option<Const>,
     /// type_ field
-    type_: Identifier,
+    type_: Types,
     /// pointer field
     pointer: Option<Pointer>,
 }
 
 impl Type {
     /// Function to create a new Type
-    pub fn new(constness: Option<Const>, type_: Identifier, pointer: Option<Pointer>) -> Type {
+    pub fn new(constness: Option<Const>, type_: Types, pointer: Option<Pointer>) -> Type {
         Type {
             constness,
             type_,
@@ -41,7 +81,26 @@ impl fmt::Display for Type {
             } else {
                 ""
             },
-            self.type_.name,
+            match &self.type_ {
+                Types::Atomic(atomic) => {
+                    match atomic {
+                        Atomic::Char => "char",
+                        Atomic::Short => "short",
+                        Atomic::Int => "int",
+                        Atomic::LongInt => "long int",
+                        Atomic::LongLongInt => "long long int",
+                        Atomic::Float => "float",
+                        Atomic::Double => "double",
+                        Atomic::LongDouble => "long double",
+                        Atomic::UnsignedChar => "unsigned char",
+                        Atomic::UnsignedShort => "unsigned short",
+                        Atomic::UnsignedInt => "unsigned int",
+                        Atomic::UnsignedLongInt => "unsigned long int",
+                        Atomic::UnsignedLongLongInt => "unsigned long long int",
+                    }
+                }
+                Types::Compound(identifier) => identifier.name.as_str(),
+            },
             if let Some(_) = self.pointer { "*" } else { "" }
         )
     }
@@ -49,13 +108,30 @@ impl fmt::Display for Type {
 
 #[cfg(test)]
 mod test {
-    use crate::ast::Identifier;
-
-    use super::{Const, Pointer, Type};
+    use super::{Atomic, Const, Pointer, Type, Types};
 
     #[test]
     fn ast_type_atomic() {
-        let types: Vec<(Type, String)> = vec![
+        let types: Vec<Type> = vec![
+            Atomic::Char,
+            Atomic::Short,
+            Atomic::Int,
+            Atomic::LongInt,
+            Atomic::LongLongInt,
+            Atomic::Float,
+            Atomic::Double,
+            Atomic::LongDouble,
+            Atomic::UnsignedChar,
+            Atomic::UnsignedShort,
+            Atomic::UnsignedInt,
+            Atomic::UnsignedLongInt,
+            Atomic::UnsignedLongLongInt,
+        ]
+        .into_iter()
+        .map(|atomic| Type::new(Some(Const), Types::Atomic(atomic), Some(Pointer)))
+        .collect();
+
+        let expected: Vec<String> = vec![
             "char",
             "short",
             "int",
@@ -71,15 +147,10 @@ mod test {
             "unsigned long long int",
         ]
         .into_iter()
-        .map(|typ| {
-            (
-                Type::new(Some(Const), Identifier::new(typ), Some(Pointer)),
-                format!("const {}*", typ),
-            )
-        })
+        .map(|ty| format!("const {}*", ty))
         .collect();
 
-        let mut iter = types.into_iter();
+        let mut iter = types.iter().zip(expected.iter());
 
         while let Some((value, expected_value)) = iter.next() {
             assert_eq!(format!("{}", value), *expected_value);
