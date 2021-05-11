@@ -10,6 +10,3 @@ edition = "2018"
 ligen-core = "0.1.7"
 proc-macro2 = "1.0.26"
 quote = "1.0.9"
-
-[patch.crates-io]
-ligen-core = { git = "https://github.com/sensorial-systems/ligen/", branch = "main" }
