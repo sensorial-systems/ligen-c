@@ -10,6 +10,7 @@
 #![warn(unused_qualifications)]
 
 pub mod ast;
+pub mod generator;
 
 mod proc_macro;
 pub use proc_macro::ligen_c;
