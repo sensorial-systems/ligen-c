@@ -1,3 +1,5 @@
+use ligen_core::ir::Integer;
+
 use crate::ast::Identifier;
 
 #[derive(Debug, PartialEq, Copy, Clone)]
@@ -66,6 +68,81 @@ impl Type {
             constness,
             type_,
             pointer,
+        }
+    }
+}
+
+impl From<ligen_core::ir::Atomic> for Atomic {
+    fn from(atomic: ligen_core::ir::Atomic) -> Self {
+        match atomic {
+            ligen_core::ir::Atomic::Integer(integer) => match integer {
+                Integer::U8
+                | Integer::U16
+                | Integer::U32
+                | Integer::U64
+                | Integer::U128
+                | Integer::USize => Atomic::UnsignedInt,
+                Integer::I8
+                | Integer::I16
+                | Integer::I32
+                | Integer::I64
+                | Integer::I128
+                | Integer::ISize => Atomic::Int,
+            },
+            ligen_core::ir::Atomic::Float(_) => Atomic::Float,
+            ligen_core::ir::Atomic::Boolean => panic!("Boolean not implemented"),
+            ligen_core::ir::Atomic::Character => Atomic::Char,
+        }
+    }
+}
+
+impl From<ligen_core::ir::Type> for Types {
+    fn from(typ: ligen_core::ir::Type) -> Self {
+        match typ {
+            ligen_core::ir::Type::Atomic(atomic) => Self::Atomic(Atomic::from(atomic)),
+            ligen_core::ir::Type::Compound(compound) => {
+                Self::Compound(Identifier::new(&compound.name))
+            }
+            ligen_core::ir::Type::Reference(reference) => Self::from(match reference {
+                ligen_core::ir::Reference::Borrow(borrow) => match borrow {
+                    ligen_core::ir::Borrow::Constant(constant) => Self::from(*constant),
+                    ligen_core::ir::Borrow::Mutable(mutable) => Self::from(*mutable),
+                },
+                ligen_core::ir::Reference::Pointer(pointer) => match pointer {
+                    ligen_core::ir::Pointer::Constant(constant) => Self::from(*constant),
+                    ligen_core::ir::Pointer::Mutable(mutable) => Self::from(*mutable),
+                },
+            }),
+        }
+    }
+}
+
+impl From<ligen_core::ir::Type> for Type {
+    fn from(typ: ligen_core::ir::Type) -> Self {
+        match typ {
+            ligen_core::ir::Type::Atomic(_) | ligen_core::ir::Type::Compound(_) => Self {
+                constness: None,
+                type_: Types::from(typ),
+                pointer: None,
+            },
+            ligen_core::ir::Type::Reference(reference) => {
+                if let ligen_core::ir::Reference::Pointer(pointer) = reference {
+                    match pointer {
+                        ligen_core::ir::Pointer::Constant(constant) => Self {
+                            constness: Some(Const),
+                            type_: Types::from(*constant),
+                            pointer: Some(Pointer),
+                        },
+                        ligen_core::ir::Pointer::Mutable(mutable) => Self {
+                            constness: None,
+                            type_: Types::from(*mutable),
+                            pointer: Some(Pointer),
+                        },
+                    }
+                } else {
+                    todo!()
+                }
+            }
         }
     }
 }

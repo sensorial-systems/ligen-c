@@ -19,7 +19,7 @@ impl StructMultiple {
     pub fn sum(x: i32, y: i32) -> i32 {
         x + y
     }
-    pub fn format(x: &str, y: &str) -> String {
+    pub fn format(x: String, y: String) -> String {
         format!("x: {}, y: {}", x, y)
     }
 }
@@ -35,12 +35,12 @@ fn externs_multiple() {
         (
             StructMultiple_say(),
             StructMultiple_sum(40, 2),
-            StructMultiple_format("te", "st")
+            StructMultiple_format("te".into(), "st".into())
         ),
         (
             StructMultiple::say(),
             StructMultiple::sum(40, 2),
-            StructMultiple::format("te", "st")
+            StructMultiple::format("te".into(), "st".into())
         )
     );
 }
