@@ -1,6 +1,6 @@
 use ligen_core::{
     ir::{
-        Implementation,
+        Attribute, Attributes, Implementation,
         ImplementationItem::{Constant, Method},
     },
     utils::Logger,
@@ -10,11 +10,41 @@ use crate::ast::Type;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
-pub struct BindingGenerator {}
+pub struct BindingGenerator {
+    sized_integer: bool,
+}
+
+impl Default for BindingGenerator {
+    fn default() -> Self {
+        Self {
+            sized_integer: false,
+        }
+    }
+}
 
 impl BindingGenerator {
-    /// log function for the Logger struct
-    pub fn generate(implementation: Implementation) -> Vec<String> {
+    /// function to create a new BindingGenerator
+    pub fn new(attr: &Attributes) -> Self {
+        let mut sized_integer = false;
+        if attr.attributes.iter().any(|attribute| {
+            if let Attribute::Named(ident, lit) = attribute {
+                if (ident.name.as_str(), lit.to_string().as_str()) == ("integer", "sized") {
+                    true
+                } else {
+                    false
+                }
+            } else {
+                false
+            }
+        }) {
+            sized_integer = true;
+        }
+
+        Self { sized_integer }
+    }
+
+    /// generate function for the BindingGenerator
+    pub fn generate(&self, implementation: Implementation) -> Vec<String> {
         let mut statements = vec![
             String::from("#pragma once"),
             String::from("#include <stdint.h>"),
@@ -40,6 +70,8 @@ impl BindingGenerator {
                         inner_types.push(format!("{} {}", format!("{}", Type::from(typ)), ident));
                     });
 
+                    //TODO: Distinguish sized types
+
                     statements.push(String::from(format!(
                         "{} {}({});",
                         if let Some(typ) = method.output {
@@ -60,5 +92,50 @@ impl BindingGenerator {
             String::from("#endif"),
         ]);
         statements
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use std::convert::TryFrom;
+
+    use ligen_core::ir::{Attribute, Attributes, Identifier, Implementation, Literal};
+    use quote::quote;
+
+    use super::BindingGenerator;
+
+    #[test]
+    fn bindings() {
+        let generator = BindingGenerator::new(&Attributes {
+            attributes: vec![Attribute::Named(
+                Identifier::new("integer"),
+                Literal::String(String::from("sized")),
+            )],
+        });
+
+        assert_eq!(
+            generator.generate(
+                Implementation::try_from(quote! {impl Test {
+                    pub fn sum(x: i32, y: i32) -> i32 {
+                        x + y
+                    }
+                }})
+                .expect("Failed to parse implementation"),
+            ),
+            [
+                "#pragma once",
+                "#include <stdint.h>",
+                "#ifdef __cplusplus",
+                "extern \"C\" {",
+                "#endif",
+                "struct Test {",
+                "void* self;",
+                "}",
+                "int Test_sum(int x, int y);",
+                "#ifdef __cplusplus",
+                "}",
+                "#endif",
+            ]
+        );
     }
 }
