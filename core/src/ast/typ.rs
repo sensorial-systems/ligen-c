@@ -56,7 +56,7 @@ pub struct Type {
     /// constness field
     constness: Option<Const>,
     /// type_ field
-    type_: Types,
+    pub type_: Types,
     /// pointer field
     pointer: Option<Pointer>,
 }

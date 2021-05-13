@@ -6,7 +6,7 @@ use ligen_core::{
     utils::Logger,
 };
 
-use crate::ast::Type;
+use crate::ast::{Type, Types};
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
@@ -60,6 +60,14 @@ impl BindingGenerator {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
                 Method(method) => {
+                    match &method.output {
+                        None => (),
+                        Some(typ) => match typ {
+                            ligen_core::ir::Type::Atomic(_)
+                            | ligen_core::ir::Type::Reference(_) => (),
+                            ligen_core::ir::Type::Compound(_) => continue,
+                        },
+                    };
                     let name =
                         format!("{}_{}", &implementation.self_.name, &method.identifier.name);
 
@@ -83,7 +91,7 @@ impl BindingGenerator {
                         inner_types.join(", ")
                     )));
                 }
-            };
+            }
         }
 
         statements.extend_from_slice(&[
