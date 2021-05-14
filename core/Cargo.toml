@@ -7,6 +7,7 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-ligen-core = "0.1.7"
+# FIXME: It can't be published like this.
+ligen-core = { path = "../../ligen/core" }
 proc-macro2 = "1.0.26"
 quote = "1.0.9"
