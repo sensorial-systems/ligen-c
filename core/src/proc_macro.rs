@@ -1,6 +1,6 @@
 //! proc-macro entrypoint.
 
-use crate::generator::{BindingGenerator, ExternGenerator};
+use crate::generator::{BindingGenerator, ExternGenerator, ProjectGenerator};
 use ligen_core::{
     ir::{Attributes, Implementation},
     utils::Logger,
@@ -28,6 +28,8 @@ pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
         let mut file = File::create(path).expect("Failed to create file");
         file.write_all(bindings.join("\n").as_bytes())
             .expect("Failed to write file");
+
+        ProjectGenerator::generate();
     } else {
         Logger::log("Not supported.");
     }
