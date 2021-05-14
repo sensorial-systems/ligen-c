@@ -6,7 +6,7 @@ use ligen_core::{
     utils::Logger,
 };
 
-use crate::ast::{Type, Types};
+use crate::ast::Type;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
