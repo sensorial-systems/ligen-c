@@ -76,22 +76,24 @@ impl From<ligen_core::ir::Atomic> for Atomic {
     fn from(atomic: ligen_core::ir::Atomic) -> Self {
         match atomic {
             ligen_core::ir::Atomic::Integer(integer) => match integer {
-                Integer::U8
-                | Integer::U16
-                | Integer::U32
-                | Integer::U64
-                | Integer::U128
-                | Integer::USize => Atomic::UnsignedInt,
-                Integer::I8
-                | Integer::I16
-                | Integer::I32
-                | Integer::I64
-                | Integer::I128
-                | Integer::ISize => Atomic::Int,
+                Integer::U8 => Atomic::UnsignedChar,
+                Integer::U16 => Atomic::UnsignedShort,
+                Integer::U32 => Atomic::UnsignedInt,
+                Integer::U64 => Atomic::UnsignedLongLongInt,
+                Integer::I8 => Atomic::Char,
+                Integer::I16 => Atomic::Short,
+                Integer::I32 => Atomic::Int,
+                Integer::I64 => Atomic::LongLongInt,
+                Integer::U128 | Integer::USize | Integer::I128 | Integer::ISize => {
+                    panic!("Atomic types u128, usize, i128 and isize not implemented")
+                }
             },
-            ligen_core::ir::Atomic::Float(_) => Atomic::Float,
+            ligen_core::ir::Atomic::Float(float) => match float {
+                ligen_core::ir::Float::F32 => Atomic::Float,
+                ligen_core::ir::Float::F64 => Atomic::Double,
+            },
             ligen_core::ir::Atomic::Boolean => panic!("Boolean not implemented"),
-            ligen_core::ir::Atomic::Character => Atomic::Char,
+            ligen_core::ir::Atomic::Character => panic!("16bit char not implemented"),
         }
     }
 }
