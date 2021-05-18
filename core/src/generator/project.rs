@@ -14,9 +14,6 @@ pub struct ProjectGenerator {}
 impl ProjectGenerator {
     /// generate function for the ProjectGenerator
     pub fn generate() -> () {
-        //TODO: Find a way to fetch the name of the project being built instead of fetching the name from ligen-c-core
-        //TODO: Find a way to fetch the version from ligen
-
         let manifest =
             Manifest::from_path(format!("{}/Cargo.toml", current_dir().unwrap().display()))
                 .expect("Failed to parse Cargo.toml");

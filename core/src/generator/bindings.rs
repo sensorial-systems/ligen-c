@@ -1,8 +1,11 @@
+use std::{fs::File, io::Write, path::Path};
+
 use ligen_core::{
     ir::{
         Attribute, Attributes, Implementation,
         ImplementationItem::{Constant, Method},
     },
+    proc_macro::Context,
     utils::Logger,
 };
 
@@ -44,7 +47,7 @@ impl BindingGenerator {
     }
 
     /// generate function for the BindingGenerator
-    pub fn generate(&self, implementation: Implementation) -> Vec<String> {
+    pub fn generate(&self, implementation: Implementation, context: Context) {
         let mut statements = vec![
             String::from("#pragma once"),
             String::from("#include <stdint.h>"),
@@ -99,51 +102,75 @@ impl BindingGenerator {
             String::from("}"),
             String::from("#endif"),
         ]);
-        statements
-    }
-}
-
-#[cfg(test)]
-mod test {
-    use std::convert::TryFrom;
-
-    use ligen_core::ir::{Attribute, Attributes, Identifier, Implementation, Literal};
-    use quote::quote;
-
-    use super::BindingGenerator;
-
-    #[test]
-    fn bindings() {
-        let generator = BindingGenerator::new(&Attributes {
-            attributes: vec![Attribute::Named(
-                Identifier::new("integer"),
-                Literal::String(String::from("sized")),
-            )],
-        });
-
-        assert_eq!(
-            generator.generate(
-                Implementation::try_from(quote! {impl Test {
-                    pub fn sum(x: i32, y: i32) -> i32 {
-                        x + y
-                    }
-                }})
-                .expect("Failed to parse implementation"),
-            ),
-            [
-                "#pragma once",
-                "#include <stdint.h>",
-                "#ifdef __cplusplus",
-                "extern \"C\" {",
-                "#endif",
-                "struct Test {",
-                "void* self;",
-                "}",
-                "int Test_sum(int x, int y);",
-                "#ifdef __cplusplus",
-                "}",
-                "#endif",
-            ]
+        let context_path = context
+            .source_file
+            .path
+            .strip_prefix("src")
+            .expect("Context path is not inside src/")
+            .parent()
+            .expect("Failed to get parent directory");
+        let path_string = format!(
+            "./target/ligen/include{}/{}.h",
+            context_path.to_string_lossy(),
+            &implementation.self_.name
         );
+        let path = Path::new(path_string.as_str());
+        let mut file = File::create(path).expect("Failed to create file");
+        file.write_all(statements.join("\n").as_bytes())
+            .expect("Failed to write file");
     }
 }
+
+// #[cfg(test)]
+// mod test {
+//     use std::{convert::TryFrom, path::PathBuf};
+
+//     use ligen_core::{
+//         ir::{Attribute, Attributes, Identifier, Implementation, Literal},
+//         proc_macro::{Context, SourceFile},
+//     };
+//     use quote::quote;
+
+//     use super::BindingGenerator;
+
+//     #[test]
+//     fn bindings() {
+//         let generator = BindingGenerator::new(&Attributes {
+//             attributes: vec![Attribute::Named(
+//                 Identifier::new("integer"),
+//                 Literal::String(String::from("sized")),
+//             )],
+//         });
+
+//         assert_eq!(
+//             generator.generate(
+//                 Implementation::try_from(quote! {impl Test {
+//                     pub fn sum(x: i32, y: i32) -> i32 {
+//                         x + y
+//                     }
+//                 }})
+//                 .expect("Failed to parse implementation"),
+//                 Context {
+//                     source_file: SourceFile {
+//                         is_real: true,
+//                         path: PathBuf::from("src/adder.rs")
+//                     }
+//                 }
+//             ),
+//             [
+//                 "#pragma once",
+//                 "#include <stdint.h>",
+//                 "#ifdef __cplusplus",
+//                 "extern \"C\" {",
+//                 "#endif",
+//                 "struct Test {",
+//                 "void* self;",
+//                 "}",
+//                 "int Test_sum(int x, int y);",
+//                 "#ifdef __cplusplus",
+//                 "}",
+//                 "#endif",
+//             ]
+//         );
+//     }
+// }
