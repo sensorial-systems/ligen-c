@@ -7,7 +7,6 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cargo-lock = "6.0.1"
 cargo_toml = "0.9.1"
 # FIXME: It can't be published like this.
 ligen-core = { path = "../../ligen/core" }

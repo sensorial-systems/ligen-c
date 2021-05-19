@@ -10,6 +10,7 @@ use ligen_core::{
 };
 
 use crate::ast::Type;
+use std::fs::create_dir_all;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
@@ -47,7 +48,7 @@ impl BindingGenerator {
     }
 
     /// generate function for the BindingGenerator
-    pub fn generate(&self, implementation: Implementation, context: Context) {
+    pub fn generate(&self, context: &Context, implementation: &Implementation) {
         let mut statements = vec![
             String::from("#pragma once"),
             String::from("#include <stdint.h>"),
@@ -59,7 +60,7 @@ impl BindingGenerator {
             String::from("}"),
         ];
 
-        for item in implementation.items {
+        for item in &implementation.items {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
                 Method(method) => {
@@ -75,18 +76,20 @@ impl BindingGenerator {
                         format!("{}_{}", &implementation.self_.name, &method.identifier.name);
 
                     let mut inner_types: Vec<String> = vec![];
-                    method.input.into_iter().for_each(|parameter| {
-                        let ident = parameter.identifier.name;
-                        let typ = parameter.type_;
-                        inner_types.push(format!("{} {}", format!("{}", Type::from(typ)), ident));
+                    method.input.iter().for_each(|parameter| {
+                        let ident = &parameter.identifier.name;
+                        let typ = &parameter.type_;
+                        inner_types.push(format!("{} {}", format!("{}", Type::from(typ.clone())), ident));
                     });
 
                     //TODO: Distinguish sized types
 
+
+
                     statements.push(String::from(format!(
                         "{} {}({});",
-                        if let Some(typ) = method.output {
-                            format!("{}", Type::from(typ))
+                        if let Some(typ) = &method.output {
+                            format!("{}", Type::from(typ.clone()))
                         } else {
                             String::from("void")
                         },
@@ -102,20 +105,14 @@ impl BindingGenerator {
             String::from("}"),
             String::from("#endif"),
         ]);
-        let context_path = context
-            .source_file
-            .path
-            .strip_prefix("src")
-            .expect("Context path is not inside src/")
-            .parent()
-            .expect("Failed to get parent directory");
-        let path_string = format!(
-            "./target/ligen/include{}/{}.h",
-            context_path.to_string_lossy(),
-            &implementation.self_.name
-        );
-        let path = Path::new(path_string.as_str());
-        let mut file = File::create(path).expect("Failed to create file");
+
+        let header_path = context.arguments.target_dir
+            .join("ligen")
+            .join("simple")
+            .join("include")
+            .join(format!("{}.h", implementation.self_.name));
+
+        let mut file = File::create(&header_path).expect(&format!("Failed to create file {}.", header_path.display()));
         file.write_all(statements.join("\n").as_bytes())
             .expect("Failed to write file");
     }
