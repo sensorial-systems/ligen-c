@@ -112,7 +112,7 @@ impl BindingGenerator {
             .arguments
             .target_dir
             .join("ligen")
-            .join(&context.arguments.name)
+            .join(&context.arguments.crate_name)
             .join("include")
             .join(format!("{}.h", implementation.self_.name));
 
