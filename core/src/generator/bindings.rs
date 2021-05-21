@@ -79,12 +79,14 @@ impl BindingGenerator {
                     method.input.iter().for_each(|parameter| {
                         let ident = &parameter.identifier.name;
                         let typ = &parameter.type_;
-                        inner_types.push(format!("{} {}", format!("{}", Type::from(typ.clone())), ident));
+                        inner_types.push(format!(
+                            "{} {}",
+                            format!("{}", Type::from(typ.clone())),
+                            ident
+                        ));
                     });
 
                     //TODO: Distinguish sized types
-
-
 
                     statements.push(String::from(format!(
                         "{} {}({});",
@@ -106,13 +108,16 @@ impl BindingGenerator {
             String::from("#endif"),
         ]);
 
-        let header_path = context.arguments.target_dir
+        let header_path = context
+            .arguments
+            .target_dir
             .join("ligen")
-            .join("simple")
+            .join(&context.arguments.name)
             .join("include")
             .join(format!("{}.h", implementation.self_.name));
 
-        let mut file = File::create(&header_path).expect(&format!("Failed to create file {}.", header_path.display()));
+        let mut file = File::create(&header_path)
+            .expect(&format!("Failed to create file {}.", header_path.display()));
         file.write_all(statements.join("\n").as_bytes())
             .expect("Failed to write file");
     }
