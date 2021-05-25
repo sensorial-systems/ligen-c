@@ -17,9 +17,7 @@ impl ProjectGenerator {
 
         let generator_version = env!("CARGO_PKG_VERSION");
 
-        let name = Arguments::from_env()
-            .expect("Couldn't get CARGO_LIGEN_ARGUMENTS")
-            .crate_name;
+        let name = &context.arguments.crate_name;
 
         let crate_path = target_dir.join("ligen").join(&name);
 
