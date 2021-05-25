@@ -4,7 +4,6 @@ use std::{
 };
 
 use crate::Context;
-use ligen_core::proc_macro::Arguments;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
