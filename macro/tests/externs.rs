@@ -24,23 +24,27 @@ impl StructMultiple {
     }
 }
 
-#[test]
-fn externs() {
-    assert_eq!(Struct_say(), Struct::say());
-}
+// FIXME: This will never happen. How can we use cargo-ligen to test it?
+#[cfg(all(test, cargo_ligen))]
+mod test {
+    #[test]
+    fn externs() {
+        assert_eq!(Struct_say(), Struct::say());
+    }
 
-#[test]
-fn externs_multiple() {
-    assert_eq!(
-        (
-            StructMultiple_say(),
-            StructMultiple_sum(40, 2),
-            StructMultiple_format("te".into(), "st".into())
-        ),
-        (
-            StructMultiple::say(),
-            StructMultiple::sum(40, 2),
-            StructMultiple::format("te".into(), "st".into())
-        )
-    );
+    #[test]
+    fn externs_multiple() {
+        assert_eq!(
+            (
+                StructMultiple_say(),
+                StructMultiple_sum(40, 2),
+                StructMultiple_format("te".into(), "st".into())
+            ),
+            (
+                StructMultiple::say(),
+                StructMultiple::sum(40, 2),
+                StructMultiple::format("te".into(), "st".into())
+            )
+        );
+    }
 }

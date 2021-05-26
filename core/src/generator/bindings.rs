@@ -1,16 +1,15 @@
-use std::{fs::File, io::Write, path::Path};
-
-use ligen_core::{
-    ir::{
-        Attribute, Attributes, Implementation,
-        ImplementationItem::{Constant, Method},
-    },
-    proc_macro::Context,
-    utils::Logger,
-};
-
 use crate::ast::Type;
-use std::fs::create_dir_all;
+
+use ligen_core::ir::Attribute;
+use ligen_core::ir::Attributes;
+use ligen_core::ir::Implementation;
+use ligen_core::ir::ImplementationItem::Constant;
+use ligen_core::ir::ImplementationItem::Method;
+use ligen_core::proc_macro::Context;
+use ligen_core::utils::Logger;
+
+use std::fs::File;
+use std::io::Write;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
