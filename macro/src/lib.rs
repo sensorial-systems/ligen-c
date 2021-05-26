@@ -10,26 +10,25 @@
 #![warn(unused_import_braces)]
 #![warn(unused_qualifications)]
 
-use ligen_c_core::{Context, SourceFile};
-use ligen_core::proc_macro::Arguments;
 use proc_macro::TokenStream;
 
 /// Entry point for ligen_c
 #[proc_macro_attribute]
-pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
+pub fn ligen_c(_args: TokenStream, _input: TokenStream) -> TokenStream {
     #[cfg(cargo_ligen)]
     {
         let source_file = proc_macro::Span::call_site().source_file();
-        let source_file = SourceFile {
+        let source_file = ligen_c_core::SourceFile {
             is_real: source_file.is_real(),
             path: source_file.path(),
         };
-        let arguments = Arguments::from_env().expect("Failed to get the arguments");
-        let context = Context {
+        let arguments =
+            ligen_core::proc_macro::Arguments::from_env().expect("Failed to get the arguments");
+        let context = ligen_c_core::Context {
             source_file,
             arguments,
         };
-        ligen_c_core::ligen_c(context, args.into(), input.into()).into()
+        ligen_c_core::ligen_c(context, _args.into(), _input.into()).into()
     }
 
     #[cfg(not(cargo_ligen))]
