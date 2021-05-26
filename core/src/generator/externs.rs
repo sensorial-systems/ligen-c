@@ -1,12 +1,12 @@
-use ligen_core::{
-    ir::{
-        Identifier, Implementation,
-        ImplementationItem::{Constant, Method},
-    },
-    utils::Logger,
-};
+use ligen_core::ir::Identifier;
+use ligen_core::ir::Implementation;
+use ligen_core::ir::ImplementationItem::Constant;
+use ligen_core::ir::ImplementationItem::Method;
+use ligen_core::utils::Logger;
 use proc_macro2::TokenStream;
-use quote::{quote, ToTokens, TokenStreamExt};
+use quote::quote;
+use quote::ToTokens;
+use quote::TokenStreamExt;
 use crate::Context;
 
 #[derive(Debug, Copy, Clone)]
@@ -15,7 +15,7 @@ pub struct ExternGenerator {}
 
 impl ExternGenerator {
     /// log function for the Logger struct
-    pub fn generate(context: &Context, implementation: &Implementation) -> TokenStream {
+    pub fn generate(_context: &Context, implementation: &Implementation) -> TokenStream {
         let mut externs = TokenStream::new();
         for item in &implementation.items {
             match item {
