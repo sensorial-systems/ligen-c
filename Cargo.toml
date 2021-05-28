@@ -4,7 +4,3 @@ members = [
     "macro",
     "examples/simple"
 ]
-
-[patch.crates-io]
-# FIXME: It's not working.
-ligen-core = { path = "../ligen/core" }
