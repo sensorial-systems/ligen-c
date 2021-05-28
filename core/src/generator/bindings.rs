@@ -54,9 +54,9 @@ impl BindingGenerator {
             String::from("#ifdef __cplusplus"),
             String::from("extern \"C\" {"),
             String::from("#endif"),
-            String::from(format!("struct {} {}", implementation.self_.name, "{")),
+            String::from(format!("struct Struct_{} {{", implementation.self_.name)),
             String::from("void* self;"),
-            String::from("}"),
+            String::from(format!("}} {};", implementation.self_.name)),
         ];
 
         for item in &implementation.items {
