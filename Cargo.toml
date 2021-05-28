@@ -1,8 +1,6 @@
 [workspace]
-members = ["core", "macro"]
-
-[patch.crates-io]
-ligen-core = { git = "https://github.com/sensorial-systems/ligen/", branch = "main" }
-
-[patch."https://github.com/sensorial-systems/ligen-c/"]
-ligen-c-core = { path = "./core" }
+members = [
+    "core",
+    "macro",
+    "examples/adder"
+]
