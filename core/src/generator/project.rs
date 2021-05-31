@@ -20,11 +20,7 @@ impl ProjectGenerator {
 
         let crate_path = target_dir.join("ligen").join(&name);
 
-        let include_path = crate_path.join("include");
-        let lib_path = crate_path.join("lib");
         let cmake_path = crate_path.join("CMakeLists.txt");
-        create_dir_all(include_path).expect("Failed to create include directory");
-        create_dir_all(lib_path).expect("Failed to create lib directory");
         let mut file =
             File::create(&cmake_path).expect(&format!("Failed to create {}", cmake_path.display()));
 
