@@ -2,7 +2,6 @@
 
 use crate::generator::BindingGenerator;
 use crate::generator::ExternGenerator;
-use crate::generator::ProjectGenerator;
 use ligen_core::ir::Attributes;
 use ligen_core::ir::Implementation;
 use ligen_core::proc_macro::Context;
@@ -15,8 +14,13 @@ use std::fs::create_dir_all;
 
 /// Generator entry point
 pub fn ligen_c(context: Context, args: TokenStream, input: TokenStream) -> TokenStream {
-    create_dir_all("./target/ligen/").expect("Failed to create target directory for the header");
-    ProjectGenerator::generate(&context);
+    let target_dir_ligen = &context.arguments.target_dir.join("ligen");
+    create_dir_all(target_dir_ligen).expect("Failed to create target directory for the header");
+
+    let project_dir = target_dir_ligen.join(&context.arguments.crate_name);
+
+    create_dir_all(project_dir.join("include")).expect("Failed to create include directory");
+    create_dir_all(project_dir.join("lib")).expect("Failed to create lib directory");
 
     let attributes = Attributes::try_from(args).expect("Couldn't get attributes.");
     let mut output = input.clone();
