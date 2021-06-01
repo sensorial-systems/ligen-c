@@ -30,15 +30,10 @@ pub fn ligen_c(args: TokenStream, input: TokenStream) -> TokenStream {
     ligen_c_core::ligen_c(context, args.into(), input.into()).into()
 }
 
-use ligen_core::ir::Attributes;
-
 #[cfg(cargo_ligen)]
 #[proc_macro]
 /// Ligen_c Project generator macro
 pub fn ligen_c_package(args: TokenStream) -> TokenStream {
-    let tokens: proc_macro2::TokenStream = args.into();
-    let args = Attributes::try_from(tokens).expect("Failed to parse Attributes.");
-
     let source_file = proc_macro::Span::call_site().source_file();
     let source_file = ligen_c_core::SourceFile {
         is_real: source_file.is_real(),
@@ -50,8 +45,7 @@ pub fn ligen_c_package(args: TokenStream) -> TokenStream {
         source_file,
         arguments,
     };
-    ligen_c_core::generator::ProjectGenerator::generate(&context, args);
-    TokenStream::new()
+    ligen_c_core::ligen_c_package(context, args.into()).into()
 }
 
 /// Entry point for ligen_c
