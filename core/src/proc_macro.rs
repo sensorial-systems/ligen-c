@@ -1,7 +1,6 @@
 //! proc-macro entrypoint.
 
-use crate::generator::BindingGenerator;
-use crate::generator::ExternGenerator;
+use crate::generator::{BindingGenerator, ExternGenerator, ProjectGenerator};
 use ligen_core::ir::Attributes;
 use ligen_core::ir::Implementation;
 use ligen_core::proc_macro::Context;
@@ -32,4 +31,12 @@ pub fn ligen_c(context: Context, args: TokenStream, input: TokenStream) -> Token
     }
 
     quote! {#output}
+}
+
+/// Project generator entry point
+pub fn ligen_c_package(context: Context, args: TokenStream) -> TokenStream {
+    let args = Attributes::try_from(args).expect("Couldn't get attributes.");
+    ProjectGenerator::generate(&context, args);
+
+    TokenStream::new()
 }
