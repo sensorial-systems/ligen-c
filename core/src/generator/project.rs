@@ -44,9 +44,10 @@ ENDIF()
 # INTERFACE is used to create a header-only library.
 ADD_LIBRARY(${{PROJECT_NAME}} INTERFACE)
 TARGET_INCLUDE_DIRECTORIES(${{PROJECT_NAME}} INTERFACE include)
-TARGET_LINK_LIBRARIES(${{PROJECT_NAME}} INTERFACE ${{CMAKE_SOURCE_DIR}}/lib/${{PROJECT_NAME}}.lib)",
-                generator_version, &name
-            );
+
+TARGET_LINK_LIBRARIES(${{PROJECT_NAME}} INTERFACE \"${{CMAKE_CURRENT_SOURCE_DIR}}/lib/${{PROJECT_NAME}}.lib\")",
+            generator_version, &name
+        );
 
             file.write_all(cmake_content.as_bytes())
                 .expect("Failed to write file");

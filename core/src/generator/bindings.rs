@@ -54,9 +54,9 @@ impl BindingGenerator {
             String::from("#ifdef __cplusplus"),
             String::from("extern \"C\" {"),
             String::from("#endif"),
-            String::from(format!("struct {} {}", implementation.self_.name, "{")),
+            String::from(format!("struct Struct_{} {{", implementation.self_.name)),
             String::from("void* self;"),
-            String::from("}"),
+            String::from(format!("}} {};", implementation.self_.name)),
         ];
 
         for item in &implementation.items {
@@ -121,57 +121,3 @@ impl BindingGenerator {
             .expect("Failed to write file");
     }
 }
-
-// #[cfg(test)]
-// mod test {
-//     use std::{convert::TryFrom, path::PathBuf};
-
-//     use ligen_core::{
-//         ir::{Attribute, Attributes, Identifier, Implementation, Literal},
-//         proc_macro::{Context, SourceFile},
-//     };
-//     use quote::quote;
-
-//     use super::BindingGenerator;
-
-//     #[test]
-//     fn bindings() {
-//         let generator = BindingGenerator::new(&Attributes {
-//             attributes: vec![Attribute::Named(
-//                 Identifier::new("integer"),
-//                 Literal::String(String::from("sized")),
-//             )],
-//         });
-
-//         assert_eq!(
-//             generator.generate(
-//                 Implementation::try_from(quote! {impl Test {
-//                     pub fn sum(x: i32, y: i32) -> i32 {
-//                         x + y
-//                     }
-//                 }})
-//                 .expect("Failed to parse implementation"),
-//                 Context {
-//                     source_file: SourceFile {
-//                         is_real: true,
-//                         path: PathBuf::from("src/adder.rs")
-//                     }
-//                 }
-//             ),
-//             [
-//                 "#pragma once",
-//                 "#include <stdint.h>",
-//                 "#ifdef __cplusplus",
-//                 "extern \"C\" {",
-//                 "#endif",
-//                 "struct Test {",
-//                 "void* self;",
-//                 "}",
-//                 "int Test_sum(int x, int y);",
-//                 "#ifdef __cplusplus",
-//                 "}",
-//                 "#endif",
-//             ]
-//         );
-//     }
-// }

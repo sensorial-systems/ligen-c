@@ -24,9 +24,10 @@ impl StructMultiple {
     }
 }
 
-// FIXME: This will never happen. How can we use cargo-ligen to test it?
-#[cfg(all(test, cargo_ligen))]
+#[cfg(cargo_ligen)]
 mod test {
+    use super::*;
+
     #[test]
     fn externs() {
         assert_eq!(Struct_say(), Struct::say());
