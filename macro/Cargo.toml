@@ -8,6 +8,5 @@ edition = "2018"
 proc-macro = true
 
 [dependencies]
-proc-macro2 = "1.0.26"
 ligen-c-core = { path = "../core" }
 ligen-core = "0.1.8"
