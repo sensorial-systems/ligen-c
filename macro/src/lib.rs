@@ -10,8 +10,6 @@
 #![warn(unused_import_braces)]
 #![warn(unused_qualifications)]
 
-use std::convert::TryFrom;
-
 use proc_macro::TokenStream;
 
 /// Entry point for ligen_c
