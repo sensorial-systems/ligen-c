@@ -54,7 +54,7 @@ impl BindingGenerator {
             String::from("#ifdef __cplusplus"),
             String::from("extern \"C\" {"),
             String::from("#endif"),
-            String::from(format!("struct Struct_{} {{", implementation.self_.name)),
+            String::from(format!("typedef struct Struct_{} {{", implementation.self_.name)),
             String::from("void* self;"),
             String::from(format!("}} {};", implementation.self_.name)),
         ];
@@ -63,14 +63,6 @@ impl BindingGenerator {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
                 Method(method) => {
-                    match &method.output {
-                        None => (),
-                        Some(typ) => match typ {
-                            ligen_core::ir::Type::Atomic(_)
-                            | ligen_core::ir::Type::Reference(_) => (),
-                            ligen_core::ir::Type::Compound(_) => continue,
-                        },
-                    };
                     let name =
                         format!("{}_{}", &implementation.self_.name, &method.identifier.name);
 

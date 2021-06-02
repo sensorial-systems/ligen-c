@@ -1,8 +1,10 @@
 //! proc-macro entrypoint.
 
 use crate::generator::{BindingGenerator, ExternGenerator, ProjectGenerator};
-use ligen_core::ir::Attributes;
-use ligen_core::ir::Implementation;
+use ligen_core::ir;
+use ir::Attributes;
+use ir::Implementation;
+use ir::processing::ReplaceIdentifier;
 use ligen_core::proc_macro::Context;
 use ligen_core::utils::Logger;
 use proc_macro2::TokenStream;
@@ -23,7 +25,12 @@ pub fn ligen_c(context: Context, args: TokenStream, input: TokenStream) -> Token
 
     let attributes = Attributes::try_from(args).expect("Couldn't get attributes.");
     let mut output = input.clone();
-    if let Ok(implementation) = Implementation::try_from(input) {
+    if let Ok(mut implementation) = Implementation::try_from(input) {
+        let id = implementation.self_.clone();
+        let mut lower_case_id = id.clone();
+        lower_case_id.name = lower_case_id.name.to_lowercase();
+        implementation.replace_identifier(&ir::Identifier::from("Self"), &id);
+        implementation.replace_identifier(&ir::Identifier::from("self"), &lower_case_id);
         output.append_all(ExternGenerator::generate(&context, &implementation));
         BindingGenerator::new(&attributes).generate(&context, &implementation);
     } else {

@@ -1,4 +1,5 @@
 use ligen_core::ir::Integer;
+use ligen_core::ir;
 
 use crate::ast::Identifier;
 
@@ -127,22 +128,37 @@ impl From<ligen_core::ir::Type> for Type {
                 type_: Types::from(typ),
                 pointer: None,
             },
-            ligen_core::ir::Type::Reference(reference) => {
-                if let ligen_core::ir::Reference::Pointer(pointer) = reference {
-                    match pointer {
-                        ligen_core::ir::Pointer::Constant(constant) => Self {
-                            constness: Some(Const),
-                            type_: Types::from(*constant),
-                            pointer: Some(Pointer),
-                        },
-                        ligen_core::ir::Pointer::Mutable(mutable) => Self {
-                            constness: None,
-                            type_: Types::from(*mutable),
-                            pointer: Some(Pointer),
-                        },
+            ir::Type::Reference(reference) => {
+                // FIXME: This needs to be simplified.
+                match reference {
+                    ir::Reference::Pointer(pointer) => {
+                        match pointer {
+                            ir::Pointer::Constant(constant) => Self {
+                                constness: Some(Const),
+                                type_: Types::from(*constant),
+                                pointer: Some(Pointer),
+                            },
+                            ir::Pointer::Mutable(mutable) => Self {
+                                constness: None,
+                                type_: Types::from(*mutable),
+                                pointer: Some(Pointer),
+                            },
+                        }
+                    },
+                    ir::Reference::Borrow(borrow) => {
+                        match borrow {
+                            ir::Borrow::Constant(constant) => Self {
+                                constness: Some(Const),
+                                type_: Types::from(*constant),
+                                pointer: Some(Pointer),
+                            },
+                            ir::Borrow::Mutable(mutable) => Self {
+                                constness: None,
+                                type_: Types::from(*mutable),
+                                pointer: Some(Pointer)
+                            }
+                        }
                     }
-                } else {
-                    todo!()
                 }
             }
         }

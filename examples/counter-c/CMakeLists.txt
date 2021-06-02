@@ -1,14 +1,14 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 3.0)
-PROJECT("adder-c")
+PROJECT("counter-c")
 
 IF(TARGET ${PROJECT_NAME})
 RETURN()
 ENDIF()
 
-ADD_SUBDIRECTORY(../../target/ligen/adder adder)
+ADD_SUBDIRECTORY(../../target/ligen/counter counter)
 
 AUX_SOURCE_DIRECTORY(src SOURCES)
 
 # INTERFACE is used to create a header-only library.
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC adder)
+TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC counter ws2_32 userenv)

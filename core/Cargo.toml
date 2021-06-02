@@ -8,6 +8,6 @@ edition = "2018"
 
 [dependencies]
 cargo_toml = "0.9.1"
-ligen-core = "0.1.8"
+ligen-core = "0.1.9-alpha.0"
 proc-macro2 = "1.0.26"
 quote = "1.0.9"

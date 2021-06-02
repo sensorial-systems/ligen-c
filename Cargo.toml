@@ -2,5 +2,8 @@
 members = [
     "core",
     "macro",
-    "examples/adder"
+    "examples/counter"
 ]
+
+[patch.crates-io]
+ligen-core = { path = "../ligen/core/" }
