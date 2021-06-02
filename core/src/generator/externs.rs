@@ -1,3 +1,4 @@
+use crate::{Context, Marshalling};
 use ligen_core::ir::Identifier;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
@@ -7,7 +8,6 @@ use proc_macro2::TokenStream;
 use quote::quote;
 use quote::ToTokens;
 use quote::TokenStreamExt;
-use crate::Context;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
@@ -30,21 +30,27 @@ impl ExternGenerator {
                     let mut parameters = TokenStream::new();
                     let mut inner_types = TokenStream::new();
                     method.input.iter().for_each(|parameter| {
+                        let inner_arg: TokenStream = Marshalling::from(&parameter.type_)
+                            .from_convert(parameter.identifier.clone());
                         let ident = parameter.identifier.to_token_stream();
-                        inner_types.append_all(quote! {#ident, });
-                        let par = parameter.to_token_stream();
-                        parameters.append_all(quote! {#par, })
+                        inner_types.append_all(quote! {#inner_arg, });
+                        let parameter_type = Marshalling::from(&parameter.type_).to_token_stream();
+                        parameters.append_all(quote! {#ident: #parameter_type, })
                     });
 
-                    let return_type = match &method.output {
+                    let return_type = match &method.output.clone() {
                         Some(ty) => {
-                            let typ = ty.to_token_stream();
+                            let typ = Marshalling::from(ty).to_token_stream();
                             quote! {#typ}
                         }
                         None => quote! {()},
                     };
+                    let conversion =
+                        Marshalling::from(&method.output.clone().unwrap()).to_convert();
                     let inner = quote! {
-                        #self_name::#method_name(#inner_types)
+                        unsafe {
+                            #self_name::#method_name(#inner_types)#conversion
+                        }
                     };
 
                     externs.append_all(quote! {

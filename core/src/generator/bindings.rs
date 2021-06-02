@@ -68,7 +68,7 @@ impl BindingGenerator {
                         Some(typ) => match typ {
                             ligen_core::ir::Type::Atomic(_)
                             | ligen_core::ir::Type::Reference(_) => (),
-                            ligen_core::ir::Type::Compound(_) => continue,
+                            ligen_core::ir::Type::Compound(_) => (),
                         },
                     };
                     let name =

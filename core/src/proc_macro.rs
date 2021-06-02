@@ -29,7 +29,7 @@ pub fn ligen_c(context: Context, args: TokenStream, input: TokenStream) -> Token
     } else {
         Logger::log("Not supported.");
     }
-
+    println!("output: {}", output.to_string());
     quote! {#output}
 }
 

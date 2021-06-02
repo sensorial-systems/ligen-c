@@ -122,10 +122,22 @@ impl From<ligen_core::ir::Type> for Types {
 impl From<ligen_core::ir::Type> for Type {
     fn from(typ: ligen_core::ir::Type) -> Self {
         match typ {
-            ligen_core::ir::Type::Atomic(_) | ligen_core::ir::Type::Compound(_) => Self {
+            ligen_core::ir::Type::Atomic(_) => Self {
                 constness: None,
                 type_: Types::from(typ),
                 pointer: None,
+            },
+            ligen_core::ir::Type::Compound(ref ident) => match ident.name.as_str() {
+                "String" => Self {
+                    constness: Some(Const),
+                    type_: Types::Atomic(Atomic::Char),
+                    pointer: Some(Pointer),
+                },
+                _ => Self {
+                    constness: None,
+                    type_: Types::from(typ),
+                    pointer: None,
+                },
             },
             ligen_core::ir::Type::Reference(reference) => {
                 if let ligen_core::ir::Reference::Pointer(pointer) = reference {
