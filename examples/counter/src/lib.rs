@@ -6,8 +6,7 @@ pub struct Counter {
 
 #[ligen_c]
 impl Counter {
-    pub fn new() -> Self {
-        let count = 0;
+    pub fn new(count: u32) -> Self {
         Self { count }
     }
 
