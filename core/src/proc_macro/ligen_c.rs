@@ -1,6 +1,6 @@
-//! proc-macro entrypoint.
+//! Generator entry point module.
 
-use crate::generator::{BindingGenerator, ExternGenerator, ProjectGenerator};
+use crate::generator::{BindingGenerator, ExternGenerator};
 use ligen_core::ir;
 use ir::Attributes;
 use ir::Implementation;
@@ -38,12 +38,4 @@ pub fn ligen_c(context: Context, args: TokenStream, input: TokenStream) -> Token
     }
 
     quote! {#output}
-}
-
-/// Project generator entry point
-pub fn ligen_c_package(context: Context, args: TokenStream) -> TokenStream {
-    let args = Attributes::try_from(args).expect("Couldn't get attributes.");
-    ProjectGenerator::generate(&context, args);
-
-    TokenStream::new()
 }
