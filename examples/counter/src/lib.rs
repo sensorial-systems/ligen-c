@@ -31,7 +31,7 @@ pub mod ffi {
 
     pub struct RString(std::ffi::CString);
 
-    // TODO: This should be moved to ligen-c so it could be always available the user.
+    // TODO: This should be moved to ligen-c so it could be always available to the user.
     #[super::ligen_c]
     impl RString {
         pub fn new(string: *const c_char) -> Self {
