@@ -20,5 +20,14 @@ int main(int argc, char **argv) {
     RString string = RString_new(s);
     printf("Result: %s\n", RString_as_ptr(string));
 //    CString_destroy(string);
+
+    Person person = Person_new("First", "Last");
+
+    RString fullName = Person_full_name(person);
+    printf("Full name: %s", RString_as_ptr(fullName));
+//    RString_destroy(fullName);
+
+//    Person_destroy(person);
+
     return 0;
 }
