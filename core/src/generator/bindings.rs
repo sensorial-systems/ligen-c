@@ -11,7 +11,6 @@ use ligen_core::utils::Logger;
 
 use std::fs::File;
 use std::io::Write;
-use std::ops::Add;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
@@ -28,8 +27,11 @@ impl Default for BindingGenerator {
 }
 
 // FIXME: Needs better API / generalization.
+/// Extension for adding source code text to a string.
 pub trait StringExt {
+    /// Push a new line.
     fn push_line<String: AsRef<str>>(&mut self, line: String);
+    /// Push a text followed by a space character.
     fn push_token<String: AsRef<str>>(&mut self, token: String);
 }
 
@@ -61,17 +63,21 @@ impl BindingGenerator {
         Self { sized_integer }
     }
 
-    pub fn generate_prelude(&self, context: &Context) -> String {
+    /// Generate source file prelude.
+    pub fn generate_prelude(&self, _context: &Context) -> String {
         let mut content = String::new();
         content.push_line("#pragma once");
+        content.push_line("");
         content.push_line("#include <stdint.h>");
-        content.push_line("#ifdef __cplusplus\n");
+        content.push_line("");
+        content.push_line("#ifdef __cplusplus");
         content.push_line("extern \"C\" {");
         content.push_line("#endif\n");
         content
     }
 
-    pub fn generate_struct(&self, context: &Context, implementation: &Implementation) -> String {
+    /// Generate struct.
+    pub fn generate_struct(&self, _context: &Context, implementation: &Implementation) -> String {
         let mut content = String::new();
         content.push_line(format!("typedef struct Struct_{} {{", implementation.self_.name));
         content.push_line("void* self;");
@@ -79,7 +85,8 @@ impl BindingGenerator {
         content
     }
 
-    pub fn generate_output(&self, _context: &Context, output: &Option<ir::Type>) -> String {
+    /// Generate function output.
+    pub fn genrate_function_output(&self, _context: &Context, output: &Option<ir::Type>) -> String {
         let type_ = output
             .as_ref()
             .map(|type_| Type::from(type_.clone()).to_string())
@@ -87,11 +94,13 @@ impl BindingGenerator {
         format!("{} ", type_)
     }
 
+    /// Generate function name.
     pub fn generate_function_name(&self, _context: &Context, implementation: &Implementation, method: &Function) -> String {
         // FIXME: This naming convention happens in the extern generator and here. How can we generalize this code?
         format!("{}_{}", &implementation.self_.name, &method.identifier.name)
     }
 
+    /// Generate function parameter.
     pub fn generate_function_parameter(&self, _context: &Context, parameter: &ir::Parameter) -> String {
         let mut type_ = Type::from(parameter.type_.clone());
         if let (Some(_pointer), Types::Compound(_type)) = (&type_.pointer, &type_.type_) {
@@ -101,6 +110,7 @@ impl BindingGenerator {
         format!("{} {}", type_, ident)
     }
 
+    /// Generate function parameters.
     pub fn generate_function_parameters(&self, context: &Context, method: &Function) -> String {
         method
             .inputs
@@ -110,8 +120,9 @@ impl BindingGenerator {
             .join(", ")
     }
 
-    pub fn generate_method(&self, context: &Context, implementation: &Implementation, method: &Function) -> String {
-        let mut content = self.generate_output(context, &method.output);
+    /// Generate function.
+    pub fn generate_function(&self, context: &Context, implementation: &Implementation, method: &Function) -> String {
+        let mut content = self.genrate_function_output(context, &method.output);
         content.push_str(&self.generate_function_name(context, implementation, method));
         content.push('(');
         content.push_str(&self.generate_function_parameters(context, method));
@@ -119,8 +130,10 @@ impl BindingGenerator {
         content
     }
 
+    /// Generate source file epilogue.
     pub fn generate_epilogue(&self, _context: &Context) -> String {
         let mut content = String::new();
+        content.push_line("");
         content.push_line("#ifdef __cplusplus");
         content.push_line("}");
         content.push_line("#endif");
@@ -135,7 +148,7 @@ impl BindingGenerator {
         for item in &implementation.items {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
-                Method(method) => content.push_line(self.generate_method(context, implementation, method))
+                Method(method) => content.push_line(self.generate_function(context, implementation, method))
             }
         }
 

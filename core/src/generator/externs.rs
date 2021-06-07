@@ -35,13 +35,15 @@ impl ExternGenerator {
             })
     }
 
+    /// Marshal type.
     pub fn to_marshal_type(type_: &Type) -> TokenStream {
         match type_ {
-            Type::Compound(identifier) => quote! { *mut #type_ },
+            Type::Compound(_identifier) => quote! { *mut #type_ },
             _ => quote! { #type_ }
         }
     }
 
+    /// Marshal type.
     pub fn from_marshal_type(type_: &Type) -> TokenStream {
         quote! { #type_ }
     }
@@ -72,7 +74,7 @@ impl ExternGenerator {
         let self_identifier = &implementation.self_;
         let method_identifier = &method.identifier;
         // FIXME: This should be generalized somewhere.
-        let result = if let Some(Type::Compound(identifier)) = method.output.as_ref() {
+        let result = if let Some(Type::Compound(_identifier)) = method.output.as_ref() {
             quote! {
                 Box::into_raw(Box::new(result))
             }

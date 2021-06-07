@@ -1,4 +1,3 @@
-use ligen_core::ir::Integer;
 use ligen_core::ir;
 
 use crate::ast::Identifier;
@@ -73,94 +72,70 @@ impl Type {
     }
 }
 
-impl From<ligen_core::ir::Atomic> for Atomic {
-    fn from(atomic: ligen_core::ir::Atomic) -> Self {
+impl From<ir::Atomic> for Atomic {
+    fn from(atomic: ir::Atomic) -> Self {
         match atomic {
-            ligen_core::ir::Atomic::Integer(integer) => match integer {
-                Integer::U8 => Atomic::UnsignedChar,
-                Integer::U16 => Atomic::UnsignedShort,
-                Integer::U32 => Atomic::UnsignedInt,
-                Integer::U64 => Atomic::UnsignedLongLongInt,
-                Integer::I8 => Atomic::Char,
-                Integer::I16 => Atomic::Short,
-                Integer::I32 => Atomic::Int,
-                Integer::I64 => Atomic::LongLongInt,
-                Integer::U128 | Integer::USize | Integer::I128 | Integer::ISize => {
+            ir::Atomic::Integer(integer) => match integer {
+                ir::Integer::U8 => Atomic::UnsignedChar,
+                ir::Integer::U16 => Atomic::UnsignedShort,
+                ir::Integer::U32 => Atomic::UnsignedInt,
+                ir::Integer::U64 => Atomic::UnsignedLongLongInt,
+                ir::Integer::I8 => Atomic::Char,
+                ir::Integer::I16 => Atomic::Short,
+                ir::Integer::I32 => Atomic::Int,
+                ir::Integer::I64 => Atomic::LongLongInt,
+                ir::Integer::U128 |
+                ir::Integer::USize |
+                ir::Integer::I128 |
+                ir::Integer::ISize => {
                     panic!("Atomic types u128, usize, i128 and isize not implemented")
                 }
             },
-            ligen_core::ir::Atomic::Float(float) => match float {
-                ligen_core::ir::Float::F32 => Atomic::Float,
-                ligen_core::ir::Float::F64 => Atomic::Double,
+            ir::Atomic::Float(float) => match float {
+                ir::Float::F32 => Atomic::Float,
+                ir::Float::F64 => Atomic::Double,
             },
-            ligen_core::ir::Atomic::Boolean => panic!("Boolean not implemented"),
-            ligen_core::ir::Atomic::Character => panic!("16bit char not implemented"),
+            ir::Atomic::Boolean => panic!("Boolean not implemented"),
+            ir::Atomic::Character => panic!("16bit char not implemented"),
         }
     }
 }
 
-impl From<ligen_core::ir::Type> for Types {
-    fn from(typ: ligen_core::ir::Type) -> Self {
-        match typ {
-            ligen_core::ir::Type::Atomic(atomic) => Self::Atomic(Atomic::from(atomic)),
-            ligen_core::ir::Type::Compound(compound) => {
-                Self::Compound(Identifier::new(&compound.name))
-            }
-            ligen_core::ir::Type::Reference(reference) => Self::from(match reference {
-                ligen_core::ir::Reference::Borrow(borrow) => match borrow {
-                    ligen_core::ir::Borrow::Constant(constant) => Self::from(*constant),
-                    ligen_core::ir::Borrow::Mutable(mutable) => Self::from(*mutable),
-                },
-                ligen_core::ir::Reference::Pointer(pointer) => match pointer {
-                    ligen_core::ir::Pointer::Constant(constant) => Self::from(*constant),
-                    ligen_core::ir::Pointer::Mutable(mutable) => Self::from(*mutable),
-                },
-            }),
+impl From<ir::Type> for Types {
+    fn from(type_: ir::Type) -> Self {
+        match type_ {
+            ir::Type::Atomic(atomic) => Self::Atomic(Atomic::from(atomic)),
+            ir::Type::Compound(compound) => Self::Compound(Identifier::new(&compound.name)),
+            ir::Type::Reference(_reference) => unimplemented!("Conversion from reference to Types isn't implemented yet."),
         }
     }
 }
 
-impl From<ligen_core::ir::Type> for Type {
-    fn from(typ: ligen_core::ir::Type) -> Self {
-        match typ {
-            ligen_core::ir::Type::Atomic(_) | ligen_core::ir::Type::Compound(_) => Self {
+impl From<ir::Reference> for Type {
+    fn from(type_: ir::Reference) -> Self {
+        let constness = if type_.is_constant { Some(Const) } else { None };
+        let type_ = Types::from(*type_.type_.clone());
+        let pointer = Some(Pointer);
+        Self { constness, type_, pointer }
+    }
+}
+
+impl From<ir::Type> for Type {
+    fn from(type_: ir::Type) -> Self {
+        match type_ {
+            ir::Type::Atomic(type_) => {
+                Self {
+                    constness: None,
+                    type_: Types::Atomic(type_.into()),
+                    pointer: None
+                }
+            },
+            ir::Type::Compound(type_) => Self {
                 constness: None,
-                type_: Types::from(typ),
+                type_: Types::Compound(Identifier::new(&type_.name)),
                 pointer: None,
             },
-            ir::Type::Reference(reference) => {
-                // FIXME: This needs to be simplified.
-                match reference {
-                    ir::Reference::Pointer(pointer) => {
-                        match pointer {
-                            ir::Pointer::Constant(constant) => Self {
-                                constness: Some(Const),
-                                type_: Types::from(*constant),
-                                pointer: Some(Pointer),
-                            },
-                            ir::Pointer::Mutable(mutable) => Self {
-                                constness: None,
-                                type_: Types::from(*mutable),
-                                pointer: Some(Pointer),
-                            },
-                        }
-                    },
-                    ir::Reference::Borrow(borrow) => {
-                        match borrow {
-                            ir::Borrow::Constant(constant) => Self {
-                                constness: Some(Const),
-                                type_: Types::from(*constant),
-                                pointer: Some(Pointer),
-                            },
-                            ir::Borrow::Mutable(mutable) => Self {
-                                constness: None,
-                                type_: Types::from(*mutable),
-                                pointer: Some(Pointer)
-                            }
-                        }
-                    }
-                }
-            }
+            ir::Type::Reference(reference) => Self::from(reference)
         }
     }
 }
