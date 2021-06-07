@@ -18,7 +18,40 @@ impl Counter {
     pub fn get_count(&self) -> u32 {
         self.count
     }
+}
 
+pub mod ffi {
+    use std::os::raw::c_char;
+    use std::ffi::CStr;
+
+    pub struct CString(std::ffi::CString);
+
+    #[super::ligen_c]
+    impl CString {
+        pub fn new(string: *const c_char) -> Self {
+            unsafe {
+                let string = std::ffi::CString::new(CStr::from_ptr(string).to_string_lossy().to_string()).expect("Yes");
+                Self(string)
+            }
+        }
+
+        pub fn as_ptr(&self) -> *const c_char {
+            self.0.as_ptr()
+        }
+    }
+
+    impl From<std::string::String> for CString {
+        fn from(string: std::string::String) -> Self {
+            let string = std::ffi::CString::new(string).expect("Couldn't create CString.");
+            Self(string)
+        }
+    }
+
+    impl From<CString> for String {
+        fn from(string: CString) -> Self {
+            string.0.to_string_lossy().to_string()
+        }
+    }
 }
 
 impl Counter {
