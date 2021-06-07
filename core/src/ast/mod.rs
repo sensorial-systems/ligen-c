@@ -1,7 +1,7 @@
 //! C Abstract Syntax Tree.
 
 mod identifier;
-mod typ;
+mod type_;
 
 pub use identifier::*;
-pub use typ::*;
+pub use type_::*;

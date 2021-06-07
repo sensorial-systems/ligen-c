@@ -55,11 +55,11 @@ pub struct Pointer;
 /// Type Struct
 pub struct Type {
     /// constness field
-    constness: Option<Const>,
+    pub constness: Option<Const>,
     /// type_ field
     pub type_: Types,
     /// pointer field
-    pointer: Option<Pointer>,
+    pub pointer: Option<Pointer>,
 }
 
 impl Type {

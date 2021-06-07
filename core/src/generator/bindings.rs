@@ -1,4 +1,4 @@
-use crate::ast::Type;
+use crate::ast::{Type, Types};
 
 use ligen_core::ir;
 use ligen_core::ir::{Attribute, Function};
@@ -27,6 +27,7 @@ impl Default for BindingGenerator {
     }
 }
 
+// FIXME: Needs better API / generalization.
 pub trait StringExt {
     fn push_line<String: AsRef<str>>(&mut self, line: String);
     fn push_token<String: AsRef<str>>(&mut self, token: String);
@@ -70,7 +71,7 @@ impl BindingGenerator {
         content
     }
 
-    pub fn generate_type(&self, context: &Context, implementation: &Implementation) -> String {
+    pub fn generate_struct(&self, context: &Context, implementation: &Implementation) -> String {
         let mut content = String::new();
         content.push_line(format!("typedef struct Struct_{} {{", implementation.self_.name));
         content.push_line("void* self;");
@@ -80,43 +81,41 @@ impl BindingGenerator {
 
     pub fn generate_output(&self, _context: &Context, output: &Option<ir::Type>) -> String {
         let type_ = output
+            .as_ref()
             .map(|type_| Type::from(type_.clone()).to_string())
             .unwrap_or_else(|| "void".into());
         format!("{} ", type_)
     }
 
+    pub fn generate_function_name(&self, _context: &Context, implementation: &Implementation, method: &Function) -> String {
+        // FIXME: This naming convention happens in the extern generator and here. How can we generalize this code?
+        format!("{}_{}", &implementation.self_.name, &method.identifier.name)
+    }
+
+    pub fn generate_function_parameter(&self, _context: &Context, parameter: &ir::Parameter) -> String {
+        let mut type_ = Type::from(parameter.type_.clone());
+        if let (Some(_pointer), Types::Compound(_type)) = (&type_.pointer, &type_.type_) {
+            type_.pointer = None;
+        }
+        let ident = &parameter.identifier.name;
+        format!("{} {}", type_, ident)
+    }
+
+    pub fn generate_function_parameters(&self, context: &Context, method: &Function) -> String {
+        method
+            .inputs
+            .iter()
+            .map(|parameter| self.generate_function_parameter(context, parameter))
+            .collect::<Vec<_>>()
+            .join(", ")
+    }
+
     pub fn generate_method(&self, context: &Context, implementation: &Implementation, method: &Function) -> String {
         let mut content = self.generate_output(context, &method.output);
-        content.push_line(self.generate_function_name(context, implementation, method));
-        // FIXME: This naming convention happens in the extern generator and here. How can we generalize this code?
-        let name = format!("{}_{}", &implementation.self_.name, &method.identifier.name);
-
-        // method
-        //     .inputs
-        //     .iter()
-        //     .map(|parameter| {
-        //
-        //     })
-        //     .collect_vec()
-        //     .join(',');
-        // {
-        //     let type_ = Type::from(parameter.type_.clone());
-        //     let ident = &parameter.identifier.name;
-        //     content.push_str(format!("{} {}", type_, ident));
-        // }
-
-        //TODO: Distinguish sized types
-
-        content.push_line(&format!(
-            "{} {}({});",
-            if let Some(typ) = &method.output {
-                format!("{}", Type::from(typ.clone()))
-            } else {
-                String::from("void")
-            },
-            &name,
-            parameters.join(", ")
-        ));
+        content.push_str(&self.generate_function_name(context, implementation, method));
+        content.push('(');
+        content.push_str(&self.generate_function_parameters(context, method));
+        content.push_str(");");
         content
     }
 
@@ -131,7 +130,7 @@ impl BindingGenerator {
     /// generate function for the BindingGenerator
     pub fn generate(&self, context: &Context, implementation: &Implementation) {
         let mut content = self.generate_prelude(context);
-        content.push_line(self.generate_type(context, implementation));
+        content.push_line(self.generate_struct(context, implementation));
 
         for item in &implementation.items {
             match item {
