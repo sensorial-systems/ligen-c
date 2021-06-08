@@ -1,11 +1,11 @@
 use crate::ast::{Type, Types};
 
-use ligen_core::ir;
-use ligen_core::ir::{Attribute, Function};
 use ligen_core::ir::Attributes;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
+use ligen_core::ir::{self, Identifier};
+use ligen_core::ir::{Attribute, Function};
 use ligen_core::proc_macro::Context;
 use ligen_core::utils::Logger;
 
@@ -54,7 +54,7 @@ impl BindingGenerator {
             if let Attribute::Named(ident, lit) = attribute {
                 (ident.name.as_str(), lit.to_string().as_str()) == ("integer", "sized")
             } else {
-                  false
+                false
             }
         }) {
             sized_integer = true;
@@ -79,7 +79,10 @@ impl BindingGenerator {
     /// Generate struct.
     pub fn generate_struct(&self, _context: &Context, implementation: &Implementation) -> String {
         let mut content = String::new();
-        content.push_line(format!("typedef struct Struct_{} {{", implementation.self_.name));
+        content.push_line(format!(
+            "typedef struct Struct_{} {{",
+            implementation.self_.name
+        ));
         content.push_line("void* self;");
         content.push_line(format!("}} {};", implementation.self_.name));
         content
@@ -95,13 +98,22 @@ impl BindingGenerator {
     }
 
     /// Generate function name.
-    pub fn generate_function_name(&self, _context: &Context, implementation: &Implementation, method: &Function) -> String {
+    pub fn generate_function_name(
+        &self,
+        _context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> String {
         // FIXME: This naming convention happens in the extern generator and here. How can we generalize this code?
         format!("{}_{}", &implementation.self_.name, &method.identifier.name)
     }
 
     /// Generate function parameter.
-    pub fn generate_function_parameter(&self, _context: &Context, parameter: &ir::Parameter) -> String {
+    pub fn generate_function_parameter(
+        &self,
+        _context: &Context,
+        parameter: &ir::Parameter,
+    ) -> String {
         let mut type_ = Type::from(parameter.type_.clone());
         if let (Some(_pointer), Types::Compound(_type)) = (&type_.pointer, &type_.type_) {
             type_.pointer = None;
@@ -121,7 +133,12 @@ impl BindingGenerator {
     }
 
     /// Generate function.
-    pub fn generate_function(&self, context: &Context, implementation: &Implementation, method: &Function) -> String {
+    pub fn generate_function(
+        &self,
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> String {
         let mut content = self.genrate_function_output(context, &method.output);
         content.push_str(&self.generate_function_name(context, implementation, method));
         content.push('(');
@@ -140,6 +157,15 @@ impl BindingGenerator {
         content
     }
 
+    /// Generate destroy binding.
+    pub fn generate_destroy(object_name: &String) -> String {
+        format!(
+            "void {0}_destroy({0} {1});",
+            object_name,
+            object_name.to_lowercase()
+        )
+    }
+
     /// generate function for the BindingGenerator
     pub fn generate(&self, context: &Context, implementation: &Implementation) {
         let mut content = self.generate_prelude(context);
@@ -148,9 +174,15 @@ impl BindingGenerator {
         for item in &implementation.items {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
-                Method(method) => content.push_line(self.generate_function(context, implementation, method))
+                Method(method) => {
+                    content.push_line(self.generate_function(context, implementation, method));
+                }
             }
         }
+
+        content.push_line(BindingGenerator::generate_destroy(
+            &implementation.self_.name,
+        ));
 
         content.push_line(self.generate_epilogue(context));
 
@@ -164,6 +196,7 @@ impl BindingGenerator {
 
         let mut file = File::create(&header_path)
             .expect(&format!("Failed to create file {}.", header_path.display()));
-        file.write_all(content.as_bytes()).expect("Couldn't write file.");
+        file.write_all(content.as_bytes())
+            .expect("Couldn't write file.");
     }
 }

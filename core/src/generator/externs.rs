@@ -1,11 +1,11 @@
-use ligen_core::ir::{Identifier, Parameter, Type, Function};
+use crate::Context;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
+use ligen_core::ir::{Function, Identifier, Parameter, Type};
 use proc_macro2::TokenStream;
 use quote::quote;
 use quote::TokenStreamExt;
-use crate::Context;
 
 #[derive(Debug, Copy, Clone)]
 /// Extern generator.
@@ -19,7 +19,7 @@ impl ExternGenerator {
             .fold(TokenStream::new(), |mut tokens, parameter| {
                 let type_ = Self::to_marshal_type(&parameter.type_);
                 let identifier = &parameter.identifier;
-                tokens.append_all(quote!{#identifier: #type_,});
+                tokens.append_all(quote! {#identifier: #type_,});
                 tokens
             })
     }
@@ -30,7 +30,7 @@ impl ExternGenerator {
             .iter()
             .fold(TokenStream::new(), |mut tokens, parameter| {
                 let identifier = &parameter.identifier;
-                tokens.append_all(quote!{#identifier,});
+                tokens.append_all(quote! {#identifier,});
                 tokens
             })
     }
@@ -39,7 +39,7 @@ impl ExternGenerator {
     pub fn to_marshal_type(type_: &Type) -> TokenStream {
         match type_ {
             Type::Compound(_identifier) => quote! { *mut #type_ },
-            _ => quote! { #type_ }
+            _ => quote! { #type_ },
         }
     }
 
@@ -52,12 +52,16 @@ impl ExternGenerator {
     pub fn generate_output(_context: &Context, output: &Option<Type>) -> TokenStream {
         match output {
             Some(type_) => Self::to_marshal_type(type_),
-            _ => quote!{()}
+            _ => quote! {()},
         }
     }
 
     /// Generate the function
-    pub fn generate_function_signature(context: &Context, implementation: &Implementation, method: &Function) -> TokenStream {
+    pub fn generate_function_signature(
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> TokenStream {
         let parameters = Self::generate_parameters(context, &method.inputs);
         let output = Self::generate_output(context, &method.output);
         let function_name = format!("{}_{}", implementation.self_.name, method.identifier.name);
@@ -69,7 +73,11 @@ impl ExternGenerator {
     }
 
     /// Generate the function
-    pub fn generate_function_block(context: &Context, implementation: &Implementation, method: &Function) -> TokenStream {
+    pub fn generate_function_block(
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> TokenStream {
         let arguments = Self::generate_arguments(context, &method.inputs);
         let self_identifier = &implementation.self_;
         let method_identifier = &method.identifier;
@@ -90,24 +98,42 @@ impl ExternGenerator {
     }
 
     /// Generate an extern function for an implementation method.
-    pub fn generate_function(context: &Context, implementation: &Implementation, method: &Function) -> TokenStream {
+    pub fn generate_function(
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> TokenStream {
         let function_signature = Self::generate_function_signature(context, implementation, method);
         let method_block = Self::generate_function_block(context, implementation, method);
         quote! { #function_signature #method_block }
     }
 
+    /// Generate destroy extern.
+    pub fn generate_destroy(object_name: &Identifier) -> TokenStream {
+        let destroy_name = Identifier::new(format!("{}_destroy", object_name.name).as_str());
+        quote! {
+            #[no_mangle]
+            pub unsafe extern fn #destroy_name(object: *mut #object_name) {
+                Box::from_raw(object);
+            }
+        }
+    }
+
     /// Generate externs for Constants and Methods.
     pub fn generate(context: &Context, implementation: &Implementation) -> TokenStream {
-        implementation.items.iter().fold(TokenStream::new(), |mut tokens, item| {
-            match item {
-                Constant(_) => unimplemented!("Constants aren't implemented yet."),
-                Method(method) => {
-                    let method = Self::generate_function(context, implementation, method);
-                    println!("{}", method);
-                    tokens.append_all(method);
-                }
-            }
-            tokens
-        })
+        let mut tokens =
+            implementation
+                .items
+                .iter()
+                .fold(TokenStream::new(), |mut tokens, item| match item {
+                    Constant(_) => unimplemented!("Constants aren't implemented yet."),
+                    Method(method) => {
+                        let method = Self::generate_function(context, implementation, method);
+                        tokens.append_all(method);
+                        tokens
+                    }
+                });
+        tokens.append_all(ExternGenerator::generate_destroy(&implementation.self_));
+        tokens
     }
 }
