@@ -157,7 +157,7 @@ impl BindingGenerator {
         content
     }
 
-    /// Generate source file epilogue.
+    /// Generate destroy binding.
     pub fn generate_destroy(object_name: &String) -> String {
         format!(
             "void {0}_destroy({0} {1});",
@@ -176,12 +176,13 @@ impl BindingGenerator {
                 Constant(_) => Logger::log("Const extern not supported."),
                 Method(method) => {
                     content.push_line(self.generate_function(context, implementation, method));
-                    content.push_line(BindingGenerator::generate_destroy(
-                        &implementation.self_.name,
-                    ))
                 }
             }
         }
+
+        content.push_line(BindingGenerator::generate_destroy(
+            &implementation.self_.name,
+        ));
 
         content.push_line(self.generate_epilogue(context));
 

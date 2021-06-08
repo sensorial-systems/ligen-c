@@ -108,7 +108,7 @@ impl ExternGenerator {
         quote! { #function_signature #method_block }
     }
 
-    /// Generate destroy method.
+    /// Generate destroy extern.
     pub fn generate_destroy(object_name: &Identifier) -> TokenStream {
         let destroy_name = Identifier::new(format!("{}_destroy", object_name.name).as_str());
         quote! {
@@ -129,7 +129,6 @@ impl ExternGenerator {
                     Constant(_) => unimplemented!("Constants aren't implemented yet."),
                     Method(method) => {
                         let method = Self::generate_function(context, implementation, method);
-                        println!("{}", method);
                         tokens.append_all(method);
                         tokens
                     }
