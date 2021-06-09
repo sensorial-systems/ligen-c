@@ -1,3 +1,5 @@
+use std::os::raw::c_char;
+
 use crate::Context;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
@@ -17,7 +19,7 @@ impl ExternGenerator {
         inputs
             .iter()
             .fold(TokenStream::new(), |mut tokens, parameter| {
-                let type_ = Self::to_marshal_type(&parameter.type_);
+                let type_ = Self::to_marshal_parameter(&parameter.type_);
                 let identifier = &parameter.identifier;
                 tokens.append_all(quote! {#identifier: #type_,});
                 tokens
@@ -30,15 +32,30 @@ impl ExternGenerator {
             .iter()
             .fold(TokenStream::new(), |mut tokens, parameter| {
                 let identifier = &parameter.identifier;
-                tokens.append_all(quote! {#identifier,});
+                tokens.append_all(quote! {#identifier.into(),});
                 tokens
             })
     }
 
     /// Marshal type.
-    pub fn to_marshal_type(type_: &Type) -> TokenStream {
+    pub fn to_marshal_output(type_: &Type) -> TokenStream {
         match type_ {
-            Type::Compound(_identifier) => quote! { *mut #type_ },
+            Type::Compound(_identifier) => match _identifier.name.as_str() {
+                "String" => quote! { *mut RString },
+
+                _ => quote! { *mut #type_ },
+            },
+            _ => quote! { #type_ },
+        }
+    }
+
+    /// Marshal type.
+    pub fn to_marshal_parameter(type_: &Type) -> TokenStream {
+        match type_ {
+            Type::Compound(_identifier) => match _identifier.name.as_str() {
+                "String" => quote! { CChar }, //quote! { *const c_char },
+                _ => quote! { *mut #type_ },
+            },
             _ => quote! { #type_ },
         }
     }
@@ -51,7 +68,7 @@ impl ExternGenerator {
     /// Generate the function output.
     pub fn generate_output(_context: &Context, output: &Option<Type>) -> TokenStream {
         match output {
-            Some(type_) => Self::to_marshal_type(type_),
+            Some(type_) => Self::to_marshal_output(type_),
             _ => quote! {()},
         }
     }
@@ -84,7 +101,7 @@ impl ExternGenerator {
         // FIXME: This should be generalized somewhere.
         let result = if let Some(Type::Compound(_identifier)) = method.output.as_ref() {
             quote! {
-                Box::into_raw(Box::new(result))
+                Box::into_raw(Box::new(result.into()))
             }
         } else {
             quote! {result}
@@ -134,6 +151,7 @@ impl ExternGenerator {
                     }
                 });
         tokens.append_all(ExternGenerator::generate_destroy(&implementation.self_));
+        //println!("tokens: {}", tokens.to_string());
         tokens
     }
 }

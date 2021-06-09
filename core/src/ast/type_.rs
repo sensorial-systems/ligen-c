@@ -84,10 +84,7 @@ impl From<ir::Atomic> for Atomic {
                 ir::Integer::I16 => Atomic::Short,
                 ir::Integer::I32 => Atomic::Int,
                 ir::Integer::I64 => Atomic::LongLongInt,
-                ir::Integer::U128 |
-                ir::Integer::USize |
-                ir::Integer::I128 |
-                ir::Integer::ISize => {
+                ir::Integer::U128 | ir::Integer::USize | ir::Integer::I128 | ir::Integer::ISize => {
                     panic!("Atomic types u128, usize, i128 and isize not implemented")
                 }
             },
@@ -106,7 +103,9 @@ impl From<ir::Type> for Types {
         match type_ {
             ir::Type::Atomic(atomic) => Self::Atomic(Atomic::from(atomic)),
             ir::Type::Compound(compound) => Self::Compound(Identifier::new(&compound.name)),
-            ir::Type::Reference(_reference) => unimplemented!("Conversion from reference to Types isn't implemented yet."),
+            ir::Type::Reference(_reference) => {
+                unimplemented!("Conversion from reference to Types isn't implemented yet.")
+            }
         }
     }
 }
@@ -116,26 +115,28 @@ impl From<ir::Reference> for Type {
         let constness = if type_.is_constant { Some(Const) } else { None };
         let type_ = Types::from(*type_.type_.clone());
         let pointer = Some(Pointer);
-        Self { constness, type_, pointer }
+        Self {
+            constness,
+            type_,
+            pointer,
+        }
     }
 }
 
 impl From<ir::Type> for Type {
     fn from(type_: ir::Type) -> Self {
         match type_ {
-            ir::Type::Atomic(type_) => {
-                Self {
-                    constness: None,
-                    type_: Types::Atomic(type_.into()),
-                    pointer: None
-                }
+            ir::Type::Atomic(type_) => Self {
+                constness: None,
+                type_: Types::Atomic(type_.into()),
+                pointer: None,
             },
             ir::Type::Compound(type_) => Self {
                 constness: None,
                 type_: Types::Compound(Identifier::new(&type_.name)),
                 pointer: None,
             },
-            ir::Type::Reference(reference) => Self::from(reference)
+            ir::Type::Reference(reference) => Self::from(reference),
         }
     }
 }
@@ -169,7 +170,10 @@ impl fmt::Display for Type {
                         Atomic::UnsignedLongLongInt => "unsigned long long int",
                     }
                 }
-                Types::Compound(identifier) => identifier.name.as_str(),
+                Types::Compound(identifier) => match identifier.name.as_str() {
+                    "String" => "const char*",
+                    _ => identifier.name.as_str(),
+                },
             },
             if let Some(_) = self.pointer { "*" } else { "" }
         )
