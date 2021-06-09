@@ -26,15 +26,7 @@ impl FFI {
                 #[ligen_c::ligen_c]
                 impl RString {
                     pub fn new(string: *const c_char) -> Self {
-                        unsafe {
-                            let string = std::ffi::CString::new(
-                                std::ffi::CStr::from_ptr(string)
-                                    .to_string_lossy()
-                                    .to_string(),
-                            )
-                                .expect("Failed to create RString.");
-                            Self(string)
-                        }
+                        string.into()
                     }
 
                     pub fn as_ptr(&self) -> *const c_char {
@@ -57,7 +49,15 @@ impl FFI {
 
                 impl From<*const c_char> for RString {
                     fn from(c_char: *const c_char) -> Self {
-                        Self::new(c_char)
+                        unsafe {
+                            let string = std::ffi::CString::new(
+                                std::ffi::CStr::from_ptr(c_char)
+                                    .to_string_lossy()
+                                    .to_string(),
+                            )
+                                .expect("Failed to create RString.");
+                            Self(string)
+                        }
                     }
                 }
             }
