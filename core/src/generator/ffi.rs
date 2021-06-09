@@ -18,11 +18,7 @@ impl FFI {
 
         impl From<CChar> for String {
             fn from(cchar: CChar) -> Self {
-                if let CChar(cchar) = cchar {
-                    unsafe { CStr::from_ptr(cchar).to_str().unwrap().to_string() }
-                } else {
-                    panic!("AAAAAAAAA")
-                }
+                    unsafe { CStr::from_ptr(cchar.0).to_str().unwrap().to_string() }
             }
         }
 
