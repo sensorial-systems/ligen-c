@@ -41,7 +41,7 @@ impl ExternGenerator {
     pub fn to_marshal_output(type_: &Type) -> TokenStream {
         match type_ {
             Type::Compound(_identifier) => match _identifier.name.as_str() {
-                "String" => quote! { *mut RString },
+                "String" => quote! { *mut crate::ffi::RString },
 
                 _ => quote! { *mut #type_ },
             },
@@ -53,7 +53,7 @@ impl ExternGenerator {
     pub fn to_marshal_parameter(type_: &Type) -> TokenStream {
         match type_ {
             Type::Compound(_identifier) => match _identifier.name.as_str() {
-                "String" => quote! { CChar }, //quote! { *const c_char },
+                "String" => quote! { crate::ffi::CChar },
                 _ => quote! { *mut #type_ },
             },
             _ => quote! { #type_ },

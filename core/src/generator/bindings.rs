@@ -92,7 +92,17 @@ impl BindingGenerator {
     pub fn genrate_function_output(&self, _context: &Context, output: &Option<ir::Type>) -> String {
         let type_ = output
             .as_ref()
-            .map(|type_| Type::from(type_.clone()).to_string())
+            .map(|type_| {
+                let typ_ = Type::from(type_.clone());
+                if let Types::Compound(compound) = typ_.type_ {
+                    match compound.name.as_str() {
+                        "String" => "RString".to_string(),
+                        _ => Type::from(type_.clone()).to_string(),
+                    }
+                } else {
+                    Type::from(type_.clone()).to_string()
+                }
+            })
             .unwrap_or_else(|| "void".into());
         format!("{} ", type_)
     }
