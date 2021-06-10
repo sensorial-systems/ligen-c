@@ -1,5 +1,3 @@
-use std::os::raw::c_char;
-
 use crate::Context;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;

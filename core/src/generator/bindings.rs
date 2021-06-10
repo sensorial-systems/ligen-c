@@ -1,10 +1,10 @@
 use crate::ast::{Type, Types};
 
+use ligen_core::ir;
 use ligen_core::ir::Attributes;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
-use ligen_core::ir::{self, Identifier};
 use ligen_core::ir::{Attribute, Function};
 use ligen_core::proc_macro::Context;
 use ligen_core::utils::Logger;
