@@ -1,10 +1,10 @@
 //! Generator entry point module.
 
 use crate::generator::{BindingGenerator, ExternGenerator};
-use ligen_core::ir;
+use ir::processing::ReplaceIdentifier;
 use ir::Attributes;
 use ir::Implementation;
-use ir::processing::ReplaceIdentifier;
+use ligen_core::ir;
 use ligen_core::proc_macro::Context;
 use ligen_core::utils::Logger;
 use proc_macro2::TokenStream;
@@ -36,6 +36,5 @@ pub fn ligen_c(context: Context, args: TokenStream, input: TokenStream) -> Token
     } else {
         Logger::log("Not supported.");
     }
-
     quote! {#output}
 }

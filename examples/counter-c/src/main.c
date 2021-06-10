@@ -1,9 +1,12 @@
 #include <Counter.h>
 #include <RString.h>
+#include <Person.h>
 #include <stdio.h>
 #include <assert.h>
+#include <string.h>
 
 #define assert_eq(a, b) { printf("assert(%d == %d)\n", a, b); assert(a == b); }
+#define string_assert_eq(a, b) { printf("assert(\"%s\" == \"%s\")\n", a, b); assert(!strcmp(a, b)); }
 
 int main(int argc, char **argv) {
     Counter counter = Counter_new(2);
@@ -12,22 +15,19 @@ int main(int argc, char **argv) {
     assert_eq(Counter_get_count(counter), 3);
     Counter_count(counter, 3);
     assert_eq(Counter_get_count(counter), 6);
-//    printf("%s\n", Counter_append("Hello ", "world!"));
-//    Counter_destroy(&counter);
+    Counter_destroy(counter);
 
-    const char* s = "Hello!";
-    printf("%p\n", s);
-    RString string = RString_new(s);
-    printf("Result: %s\n", RString_as_ptr(string));
-//    CString_destroy(string);
+    RString string = RString_new("Hello!");
+    string_assert_eq("Hello!", RString_as_ptr(string));
+    RString_destroy(string);
 
-    Person person = Person_new("First", "Last");
+    Person person = Person_new("Danilo", "Guanabara");
 
     RString fullName = Person_full_name(person);
-    printf("Full name: %s", RString_as_ptr(fullName));
-//    RString_destroy(fullName);
+    string_assert_eq("Danilo Guanabara", RString_as_ptr(fullName));
+    RString_destroy(fullName);
 
-//    Person_destroy(person);
+    Person_destroy(person);
 
     return 0;
 }
