@@ -151,7 +151,6 @@ impl ExternGenerator {
                     }
                 });
         tokens.append_all(ExternGenerator::generate_destroy(&implementation.self_));
-        //println!("tokens: {}", tokens.to_string());
         tokens
     }
 }
