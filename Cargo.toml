@@ -6,4 +6,4 @@ members = [
 ]
 
 [patch.crates-io]
-ligen-core = { path = "../ligen/core/" }
+ligen-core = { git = "https://github.com/sensorial-systems/ligen", branch = "main" }

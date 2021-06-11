@@ -20,20 +20,19 @@ impl Counter {
 }
 
 pub struct Person {
-    first_name: String,
-    last_name: String
+    pub first_name: String,
+    pub last_name: String
 }
 
-// #[ligen_c]
-// impl Person {
-//     // TODO: Transform String to RString.
-//     pub fn new(first_name: String, last_name: String) -> Self {
-//         Self { first_name, last_name }
-//     }
-//
-//     pub fn full_name(&self) -> String {
-//         format!("{} {}", self.first_name, self.last_name)
-//     }
-// }
+#[ligen_c]
+impl Person {
+    pub fn new(first_name: String, last_name: String) -> Self {
+        Self { first_name, last_name }
+    }
+
+    pub fn full_name(&self) -> String {
+        format!("{} {}", self.first_name, self.last_name)
+    }
+}
 
 ligen_c_package!(cmake);

@@ -1,11 +1,13 @@
 use crate::ast::{Type, Types};
 
-use ligen_core::ir::Attributes;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
-use ligen_core::ir::{self, Identifier, Visibility};
-use ligen_core::ir::{Attribute, Function};
+use ligen_core::ir;
+use ir::Visibility;
+use ir::Attribute;
+use ir::Attributes;
+use ir::Function;
 use ligen_core::proc_macro::Context;
 use ligen_core::utils::Logger;
 
@@ -149,11 +151,14 @@ impl BindingGenerator {
         implementation: &Implementation,
         method: &Function,
     ) -> String {
-        let mut content = self.genrate_function_output(context, &method.output);
-        content.push_str(&self.generate_function_name(context, implementation, method));
-        content.push('(');
-        content.push_str(&self.generate_function_parameters(context, method));
-        content.push_str(");");
+        let mut content = String::new();
+        if let Visibility::Public = method.visibility {
+            content.push_str(&self.genrate_function_output(context, &method.output));
+            content.push_str(&self.generate_function_name(context, implementation, method));
+            content.push('(');
+            content.push_str(&self.generate_function_parameters(context, method));
+            content.push_str(");");
+        }
         content
     }
 
@@ -184,11 +189,7 @@ impl BindingGenerator {
         for item in &implementation.items {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
-                Method(method) => {
-                    if let Visibility::Public = method.vis {
-                        content.push_line(self.generate_function(context, implementation, method));
-                    }
-                }
+                Method(method) => content.push_line(self.generate_function(context, implementation, method)),
             }
         }
 
