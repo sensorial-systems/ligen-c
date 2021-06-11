@@ -1,8 +1,8 @@
 use crate::Context;
-use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
 use ligen_core::ir::{Function, Identifier, Parameter, Type};
+use ligen_core::ir::{Implementation, Visibility};
 use proc_macro2::TokenStream;
 use quote::quote;
 use quote::TokenStreamExt;
@@ -118,9 +118,13 @@ impl ExternGenerator {
         implementation: &Implementation,
         method: &Function,
     ) -> TokenStream {
-        let function_signature = Self::generate_function_signature(context, implementation, method);
-        let method_block = Self::generate_function_block(context, implementation, method);
-        quote! { #function_signature #method_block }
+        if let Visibility::Public = method.visibility {
+            let function_signature = Self::generate_function_signature(context, implementation, method);
+            let method_block = Self::generate_function_block(context, implementation, method);
+            quote! { #function_signature #method_block }
+        } else {
+            quote! {}
+        }
     }
 
     /// Generate destroy extern.
@@ -140,13 +144,12 @@ impl ExternGenerator {
             implementation
                 .items
                 .iter()
-                .fold(TokenStream::new(), |mut tokens, item| match item {
-                    Constant(_) => unimplemented!("Constants aren't implemented yet."),
-                    Method(method) => {
-                        let method = Self::generate_function(context, implementation, method);
-                        tokens.append_all(method);
-                        tokens
+                .fold(TokenStream::new(), |mut tokens, item| {
+                    match item {
+                        Constant(_) => unimplemented!("Constants aren't implemented yet."),
+                        Method(method) => tokens.append_all(Self::generate_function(context, implementation, method)),
                     }
+                    tokens
                 });
         tokens.append_all(ExternGenerator::generate_destroy(&implementation.self_));
         tokens

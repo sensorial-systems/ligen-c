@@ -9,4 +9,4 @@ proc-macro = true
 
 [dependencies]
 ligen-c-core = { path = "../core" }
-ligen-core = "0.1.9-alpha.0"
+ligen-core = "0.1.12"

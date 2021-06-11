@@ -20,8 +20,8 @@ impl Counter {
 }
 
 pub struct Person {
-    first_name: String,
-    last_name: String
+    pub first_name: String,
+    pub last_name: String
 }
 
 #[ligen_c]
