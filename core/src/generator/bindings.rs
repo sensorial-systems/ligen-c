@@ -4,7 +4,7 @@ use ligen_core::ir::Attributes;
 use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
-use ligen_core::ir::{self, Identifier};
+use ligen_core::ir::{self, Identifier, Visibility};
 use ligen_core::ir::{Attribute, Function};
 use ligen_core::proc_macro::Context;
 use ligen_core::utils::Logger;
@@ -185,7 +185,9 @@ impl BindingGenerator {
             match item {
                 Constant(_) => Logger::log("Const extern not supported."),
                 Method(method) => {
-                    content.push_line(self.generate_function(context, implementation, method));
+                    if let Visibility::Public = method.vis {
+                        content.push_line(self.generate_function(context, implementation, method));
+                    }
                 }
             }
         }

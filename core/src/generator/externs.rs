@@ -1,10 +1,10 @@
 use std::os::raw::c_char;
 
 use crate::Context;
-use ligen_core::ir::Implementation;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
 use ligen_core::ir::{Function, Identifier, Parameter, Type};
+use ligen_core::ir::{Implementation, Visibility};
 use proc_macro2::TokenStream;
 use quote::quote;
 use quote::TokenStreamExt;
@@ -145,8 +145,10 @@ impl ExternGenerator {
                 .fold(TokenStream::new(), |mut tokens, item| match item {
                     Constant(_) => unimplemented!("Constants aren't implemented yet."),
                     Method(method) => {
-                        let method = Self::generate_function(context, implementation, method);
-                        tokens.append_all(method);
+                        if let Visibility::Public = method.vis {
+                            let method = Self::generate_function(context, implementation, method);
+                            tokens.append_all(method);
+                        }
                         tokens
                     }
                 });
