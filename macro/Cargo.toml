@@ -1,5 +1,5 @@
 [package]
-name = "ligen-c"
+name    = "ligen-c"
 version = "0.1.0"
 authors = ["Danilo Guanabara <danguafer@gmail.com>"]
 edition = "2018"
@@ -9,4 +9,4 @@ proc-macro = true
 
 [dependencies]
 ligen-c-core = { path = "../core" }
-ligen-core = "0.1.12"
+ligen-core   = { path = "../../ligen/core" }

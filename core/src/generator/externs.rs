@@ -127,12 +127,12 @@ impl ExternGenerator {
         }
     }
 
-    /// Generate destroy extern.
-    pub fn generate_destroy(object_name: &Identifier) -> TokenStream {
-        let destroy_name = Identifier::new(format!("{}_destroy", object_name.name).as_str());
+    /// Generate drop extern.
+    pub fn generate_drop(object_name: &Identifier) -> TokenStream {
+        let drop_name = Identifier::new(format!("{}_drop", object_name.name).as_str());
         quote! {
             #[no_mangle]
-            pub unsafe extern fn #destroy_name(object: *mut #object_name) {
+            pub unsafe extern fn #drop_name(object: *mut #object_name) {
                 Box::from_raw(object);
             }
         }
@@ -151,7 +151,7 @@ impl ExternGenerator {
                     }
                     tokens
                 });
-        tokens.append_all(ExternGenerator::generate_destroy(&implementation.self_));
+        tokens.append_all(ExternGenerator::generate_drop(&implementation.self_));
         tokens
     }
 }

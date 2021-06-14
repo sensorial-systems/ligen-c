@@ -4,6 +4,3 @@ members = [
     "macro",
     "examples/counter"
 ]
-
-[patch.crates-io]
-ligen-core = { git = "https://github.com/sensorial-systems/ligen", branch = "main" }

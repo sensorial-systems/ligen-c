@@ -172,10 +172,10 @@ impl BindingGenerator {
         content
     }
 
-    /// Generate destroy binding.
-    pub fn generate_destroy(object_name: &String) -> String {
+    /// Generate drop binding.
+    pub fn generate_drop(object_name: &String) -> String {
         format!(
-            "void {0}_destroy({0} {1});",
+            "void {0}_drop({0} {1});",
             object_name,
             object_name.to_lowercase()
         )
@@ -193,7 +193,7 @@ impl BindingGenerator {
             }
         }
 
-        content.push_line(BindingGenerator::generate_destroy(
+        content.push_line(BindingGenerator::generate_drop(
             &implementation.self_.name,
         ));
 
