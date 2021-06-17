@@ -9,7 +9,7 @@ pub struct ProjectGenerator {}
 
 impl ProjectGenerator {
     /// generate function for the ProjectGenerator
-    pub fn generate(context: &Context, args: Attributes) {
+    pub fn generate(context: &Context, attributes: &Attributes) {
         let target_dir = &context.arguments.target_dir;
 
         let generator_version = env!("CARGO_PKG_VERSION");
@@ -18,10 +18,10 @@ impl ProjectGenerator {
 
         let crate_path = target_dir.join("ligen").join(&name);
 
-        if args
+        if attributes
             .attributes
-            .into_iter()
-            .any(|attr| attr == Attribute::Literal(Literal::String(String::from("cmake"))))
+            .iter()
+            .any(|attr| *attr == Attribute::Literal(Literal::String(String::from("cmake"))))
         {
             let cmake_path = crate_path.join("CMakeLists.txt");
             let mut file = File::create(&cmake_path)
