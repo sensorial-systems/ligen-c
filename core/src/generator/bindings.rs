@@ -8,7 +8,7 @@ use ir::Visibility;
 use ir::Attribute;
 use ir::Attributes;
 use ir::Function;
-use ligen_core::proc_macro::Context;
+use ligen_core::generator::Context;
 use ligen_core::utils::Logger;
 
 use std::fs::File;

@@ -102,7 +102,7 @@ impl From<ir::Type> for Types {
     fn from(type_: ir::Type) -> Self {
         match type_ {
             ir::Type::Atomic(atomic) => Self::Atomic(Atomic::from(atomic)),
-            ir::Type::Compound(compound) => Self::Compound(Identifier::new(&compound.name)),
+            ir::Type::Compound(compound) => Self::Compound(compound.segments.last().unwrap().clone()),
             ir::Type::Reference(_reference) => {
                 unimplemented!("Conversion from reference to Types isn't implemented yet.")
             }
@@ -131,9 +131,9 @@ impl From<ir::Type> for Type {
                 type_: Types::Atomic(type_.into()),
                 pointer: None,
             },
-            ir::Type::Compound(type_) => Self {
+            ir::Type::Compound(path) => Self {
                 constness: None,
-                type_: Types::Compound(Identifier::new(&type_.name)),
+                type_: Types::Compound(path.segments.last().unwrap().clone()),
                 pointer: None,
             },
             ir::Type::Reference(reference) => Self::from(reference),

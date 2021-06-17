@@ -1,8 +1,7 @@
 use std::fs::File;
 use std::io::Write;
 use ligen_core::ir::{Attribute, Attributes, Literal};
-
-use crate::Context;
+use ligen_core::generator::Context;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates

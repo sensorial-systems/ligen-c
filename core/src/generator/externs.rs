@@ -1,8 +1,8 @@
-use crate::Context;
 use ligen_core::ir::ImplementationItem::Constant;
 use ligen_core::ir::ImplementationItem::Method;
 use ligen_core::ir::{Function, Identifier, Parameter, Type};
 use ligen_core::ir::{Implementation, Visibility};
+use ligen_core::generator::Context;
 use proc_macro2::TokenStream;
 use quote::quote;
 use quote::TokenStreamExt;
@@ -38,9 +38,8 @@ impl ExternGenerator {
     /// Marshal type.
     pub fn to_marshal_output(type_: &Type) -> TokenStream {
         match type_ {
-            Type::Compound(_identifier) => match _identifier.name.as_str() {
+            Type::Compound(path) => match path.segments.last().unwrap().name.as_str() {
                 "String" => quote! { *mut crate::ffi::RString },
-
                 _ => quote! { *mut #type_ },
             },
             _ => quote! { #type_ },
@@ -50,17 +49,12 @@ impl ExternGenerator {
     /// Marshal type.
     pub fn to_marshal_parameter(type_: &Type) -> TokenStream {
         match type_ {
-            Type::Compound(_identifier) => match _identifier.name.as_str() {
+            Type::Compound(path) => match path.segments.last().unwrap().name.as_str() {
                 "String" => quote! { crate::ffi::CChar },
                 _ => quote! { *mut #type_ },
             },
             _ => quote! { #type_ },
         }
-    }
-
-    /// Marshal type.
-    pub fn from_marshal_type(type_: &Type) -> TokenStream {
-        quote! { #type_ }
     }
 
     /// Generate the function output.
