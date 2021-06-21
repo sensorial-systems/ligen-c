@@ -11,8 +11,9 @@ use ir::Function;
 use ligen_core::generator::Context;
 use ligen_core::utils::Logger;
 
-use std::fs::File;
-use std::io::Write;
+use std::path::PathBuf;
+use ligen_core::generator::file::FileSet;
+use ligen_core::generator::file::File;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
@@ -182,7 +183,7 @@ impl BindingGenerator {
     }
 
     /// generate function for the BindingGenerator
-    pub fn generate(&self, context: &Context, implementation: &Implementation) {
+    pub fn generate(&self, context: &Context, implementation: &Implementation) -> FileSet {
         let mut content = self.generate_prelude(context);
         content.push_line(self.generate_struct(context, implementation));
 
@@ -199,17 +200,11 @@ impl BindingGenerator {
 
         content.push_line(self.generate_epilogue(context));
 
-        let header_path = context
-            .arguments
-            .target_dir
-            .join("ligen")
-            .join(&context.arguments.crate_name)
-            .join("include")
+        let path = PathBuf::from("include")
             .join(format!("{}.h", implementation.self_.name));
-
-        let mut file = File::create(&header_path)
-            .expect(&format!("Failed to create file {}.", header_path.display()));
-        file.write_all(content.as_bytes())
-            .expect("Couldn't write file.");
+        let mut file_set = FileSet::new();
+        let file = File::new(path, content);
+        file_set.add(file);
+        file_set
     }
 }

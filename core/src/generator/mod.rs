@@ -18,6 +18,7 @@ use ir::Implementation;
 use ligen_core::ir;
 use ligen_core::generator::Context;
 use proc_macro2::TokenStream;
+use ligen_core::generator::file::FileSet;
 
 /// Generator structure.
 #[derive(Clone, Copy, Debug)]
@@ -37,10 +38,10 @@ impl ligen_core::generator::Generator for Generator {
             .unwrap_or_else(|| TokenStream::new())
     }
 
-    fn generate_files(&self, context: &Context, implementation: Option<&Implementation>) {
-        if let Some(implementation) = implementation {
-            self.binding_generator.generate(context, implementation)
-        }
+    fn generate_files(&self, context: &Context, implementation: Option<&Implementation>) -> FileSet {
+        implementation
+            .map(|implementation| self.binding_generator.generate(context, implementation))
+            .unwrap_or_default()
     }
 }
 
@@ -61,7 +62,7 @@ impl ligen_core::generator::Generator for ProjectGenerator {
         ffi::FFI::generate_rstring()
     }
 
-    fn generate_files(&self, context: &Context, _implementation: Option<&Implementation>) {
+    fn generate_files(&self, context: &Context, _implementation: Option<&Implementation>) -> FileSet {
         project::ProjectGenerator::generate(context, &self.attributes)
     }
 }
