@@ -1,6 +1,7 @@
 use ligen_core::ir::Attributes;
 use ligen_core::generator::Context;
-use ligen_core::generator::file::{FileSet, File};
+use ligen_core::generator::FileSet;
+use ligen_core::generator::File;
 use std::path::PathBuf;
 
 #[derive(Debug, Copy, Clone)]

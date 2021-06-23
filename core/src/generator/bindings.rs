@@ -12,8 +12,8 @@ use ligen_core::generator::Context;
 use ligen_core::utils::Logger;
 
 use std::path::PathBuf;
-use ligen_core::generator::file::FileSet;
-use ligen_core::generator::file::File;
+use ligen_core::generator::FileSet;
+use ligen_core::generator::File;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates

@@ -10,15 +10,13 @@ pub use externs::*;
 pub use project::*;
 pub use ffi::*;
 
-
-
 use crate::generator::{BindingGenerator, ExternGenerator};
 use ir::Attributes;
 use ir::Implementation;
 use ligen_core::ir;
 use ligen_core::generator::Context;
+use ligen_core::generator::FileSet;
 use proc_macro2::TokenStream;
-use ligen_core::generator::file::FileSet;
 
 /// Generator structure.
 #[derive(Clone, Copy, Debug)]
@@ -32,7 +30,7 @@ impl ligen_core::generator::Generator for Generator {
         Self { binding_generator }
     }
 
-    fn generate_externs(&self, context: &Context, implementation: Option<&Implementation>) -> TokenStream {
+    fn generate_ffi(&self, context: &Context, implementation: Option<&Implementation>) -> TokenStream {
         implementation
             .map(|implementation| ExternGenerator::generate(context, implementation))
             .unwrap_or_else(|| TokenStream::new())
@@ -44,6 +42,9 @@ impl ligen_core::generator::Generator for Generator {
             .unwrap_or_default()
     }
 }
+
+impl ligen_core::generator::FileGenerator for Generator {}
+impl ligen_core::generator::FFIGenerator  for Generator {}
 
 /// CMake project generator.
 #[derive(Debug, Clone)]
@@ -58,7 +59,7 @@ impl ligen_core::generator::Generator for ProjectGenerator {
         Self { attributes }
     }
 
-    fn generate_externs(&self, _context: &Context, _implementation: Option<&Implementation>) -> TokenStream {
+    fn generate_ffi(&self, _context: &Context, _implementation: Option<&Implementation>) -> TokenStream {
         ffi::FFI::generate_rstring()
     }
 
@@ -66,3 +67,6 @@ impl ligen_core::generator::Generator for ProjectGenerator {
         project::ProjectGenerator::generate(context, &self.attributes)
     }
 }
+
+impl ligen_core::generator::FileGenerator for ProjectGenerator {}
+impl ligen_core::generator::FFIGenerator for ProjectGenerator {}
