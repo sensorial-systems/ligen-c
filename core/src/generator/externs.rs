@@ -3,9 +3,7 @@ use ligen_core::ir::ImplementationItem::Method;
 use ligen_core::ir::{Function, Identifier, Parameter, Type};
 use ligen_core::ir::{Implementation, Visibility};
 use ligen_core::generator::Context;
-use proc_macro2::TokenStream;
-use quote::quote;
-use quote::TokenStreamExt;
+use ligen_core::prelude::*;
 
 #[derive(Debug, Copy, Clone)]
 /// Extern generator.

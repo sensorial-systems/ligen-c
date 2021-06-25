@@ -1,18 +1,35 @@
-use ligen_core::ir::Attributes;
-use ligen_core::generator::Context;
-use ligen_core::generator::FileSet;
+use ligen_core::prelude::*;
+use ligen_core::ir::{Attributes, Implementation};
+use ligen_core::generator::{Context, FileSet, FileGenerator};
 use ligen_core::generator::File;
 use std::path::PathBuf;
 
-#[derive(Debug, Copy, Clone)]
-/// Logger struct used for Display in the ligen crates
-pub struct ProjectGenerator {}
+/// CMake project generator.
+#[derive(Debug, Clone)]
+// FIXME: Rewrite it.
+pub struct ProjectGenerator {
+    attributes: Attributes
+}
 
-impl ProjectGenerator {
-    /// generate function for the ProjectGenerator
-    pub fn generate(context: &Context, _attributes: &Attributes) -> FileSet {
-        let mut file_set = FileSet::new();
+impl ligen_core::generator::Generator for ProjectGenerator {
+    fn new(_context: &Context, attributes: &Attributes) -> Self {
+        let attributes = attributes.clone();
+        Self { attributes }
+    }
 
+    fn generate_ffi(&self, _context: &Context, _implementation: Option<&Implementation>) -> TokenStream {
+        super::ffi::FFI::generate_rstring()
+    }
+
+    fn generate_files(&self, context: &Context, _implementation: Option<&Implementation>) -> FileSet {
+        let mut file_set = FileSet::default();
+        self.generate_file_set(&context, &mut file_set);
+        file_set
+    }
+}
+
+impl ligen_core::generator::FileGenerator for ProjectGenerator {
+    fn generate_file_set(&self, context: &Context, file_set: &mut FileSet) {
         let generator_version = env!("CARGO_PKG_VERSION");
         let project_name = &context.arguments.crate_name;
 
@@ -23,6 +40,7 @@ impl ProjectGenerator {
         );
         let file = File::new(PathBuf::from("CMakeLists.txt"), content);
         file_set.add(file);
-        file_set
     }
 }
+
+impl ligen_core::generator::FFIGenerator for ProjectGenerator {}

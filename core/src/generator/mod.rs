@@ -14,9 +14,11 @@ use crate::generator::{BindingGenerator, ExternGenerator};
 use ir::Attributes;
 use ir::Implementation;
 use ligen_core::ir;
-use ligen_core::generator::Context;
+use ligen_core::generator::{Context, File};
 use ligen_core::generator::FileSet;
-use proc_macro2::TokenStream;
+use ligen_core::generator::FileGenerator;
+use ligen_core::prelude::*;
+use std::path::PathBuf;
 
 /// Generator structure.
 #[derive(Clone, Copy, Debug)]
@@ -43,30 +45,7 @@ impl ligen_core::generator::Generator for Generator {
     }
 }
 
-impl ligen_core::generator::FileGenerator for Generator {}
+impl ligen_core::generator::FileGenerator for Generator {
+    fn generate_file_set(&self, _context: &Context, _file_set: &mut FileSet) {}
+}
 impl ligen_core::generator::FFIGenerator  for Generator {}
-
-/// CMake project generator.
-#[derive(Debug, Clone)]
-// FIXME: Rewrite it.
-pub struct ProjectGenerator {
-    attributes: Attributes
-}
-
-impl ligen_core::generator::Generator for ProjectGenerator {
-    fn new(_context: &Context, attributes: &Attributes) -> Self {
-        let attributes = attributes.clone();
-        Self { attributes }
-    }
-
-    fn generate_ffi(&self, _context: &Context, _implementation: Option<&Implementation>) -> TokenStream {
-        ffi::FFI::generate_rstring()
-    }
-
-    fn generate_files(&self, context: &Context, _implementation: Option<&Implementation>) -> FileSet {
-        project::ProjectGenerator::generate(context, &self.attributes)
-    }
-}
-
-impl ligen_core::generator::FileGenerator for ProjectGenerator {}
-impl ligen_core::generator::FFIGenerator for ProjectGenerator {}

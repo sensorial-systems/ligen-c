@@ -9,5 +9,3 @@ edition = "2018"
 [dependencies]
 cargo_toml  = "0.9.2"
 ligen-core  = { path = "../../ligen/core" }
-proc-macro2 = "1.0.26"
-quote       = "1.0.9"
