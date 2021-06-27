@@ -1,4 +1,4 @@
-use ligen_core::prelude::*;
+use ligen::prelude::*;
 
 #[derive(Debug, Clone, Copy)]
 /// FFI.

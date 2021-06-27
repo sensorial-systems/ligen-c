@@ -1,0 +1,12 @@
+[package]
+name    = "ligen-c-macro"
+version = "0.1.0"
+authors = [ "Danilo Guanabara <danguafer@gmail.com>" ]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+ligen-c-core = { path = "../core" }
+ligen        = { path = "../../../ligen/crates/ligen" }

@@ -1,6 +1,7 @@
 [workspace]
 members = [
-    "core",
-    "macro",
+    "crates/core",
+    "crates/macro",
+    "crates/ligen-c",
     "examples/counter"
 ]

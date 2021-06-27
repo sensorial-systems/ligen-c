@@ -1,0 +1,11 @@
+[package]
+name = "ligen-c"
+version = "0.1.0"
+authors = ["Danilo Guanabara <danguafer@gmail.com>"]
+edition = "2018"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ligen-c-core  = { path = "../core"  }
+ligen-c-macro = { path = "../macro" }

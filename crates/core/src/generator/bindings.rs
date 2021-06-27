@@ -1,19 +1,19 @@
 use crate::ast::{Type, Types};
 
-use ligen_core::ir::Implementation;
-use ligen_core::ir::ImplementationItem::Constant;
-use ligen_core::ir::ImplementationItem::Method;
-use ligen_core::ir;
+use ligen::ir::Implementation;
+use ligen::ir::ImplementationItem::Constant;
+use ligen::ir::ImplementationItem::Method;
+use ligen::ir;
 use ir::Visibility;
 use ir::Attribute;
 use ir::Attributes;
 use ir::Function;
-use ligen_core::generator::Context;
-use ligen_core::utils::Logger;
+use ligen::generator::Context;
+use ligen::utils::Logger;
 
 use std::path::PathBuf;
-use ligen_core::generator::FileSet;
-use ligen_core::generator::File;
+use ligen::generator::FileSet;
+use ligen::generator::File;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates

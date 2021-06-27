@@ -1,9 +1,9 @@
-use ligen_core::ir::ImplementationItem::Constant;
-use ligen_core::ir::ImplementationItem::Method;
-use ligen_core::ir::{Function, Identifier, Parameter, Type};
-use ligen_core::ir::{Implementation, Visibility};
-use ligen_core::generator::Context;
-use ligen_core::prelude::*;
+use ligen::ir::ImplementationItem::Constant;
+use ligen::ir::ImplementationItem::Method;
+use ligen::ir::{Function, Identifier, Parameter, Type};
+use ligen::ir::{Implementation, Visibility};
+use ligen::generator::Context;
+use ligen::prelude::*;
 
 #[derive(Debug, Copy, Clone)]
 /// Extern generator.

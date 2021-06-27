@@ -13,11 +13,11 @@ pub use ffi::*;
 use crate::generator::{BindingGenerator, ExternGenerator};
 use ir::Attributes;
 use ir::Implementation;
-use ligen_core::ir;
-use ligen_core::generator::{Context, File};
-use ligen_core::generator::FileSet;
-use ligen_core::generator::FileGenerator;
-use ligen_core::prelude::*;
+use ligen::ir;
+use ligen::generator::{Context, File};
+use ligen::generator::FileSet;
+use ligen::generator::FileGenerator;
+use ligen::prelude::*;
 use std::path::PathBuf;
 
 /// Generator structure.
@@ -26,7 +26,7 @@ pub struct Generator {
     binding_generator: BindingGenerator
 }
 
-impl ligen_core::generator::Generator for Generator {
+impl ligen::generator::Generator for Generator {
     fn new(_context: &Context, attributes: &Attributes) -> Self {
         let binding_generator = BindingGenerator::new(attributes);
         Self { binding_generator }
@@ -45,7 +45,7 @@ impl ligen_core::generator::Generator for Generator {
     }
 }
 
-impl ligen_core::generator::FileGenerator for Generator {
+impl ligen::generator::FileGenerator for Generator {
     fn generate_file_set(&self, _context: &Context, _file_set: &mut FileSet) {}
 }
-impl ligen_core::generator::FFIGenerator  for Generator {}
+impl ligen::generator::FFIGenerator  for Generator {}

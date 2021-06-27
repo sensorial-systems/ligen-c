@@ -11,4 +11,4 @@ crate-type = ["lib","staticlib"]
 
 [dependencies]
 # FIXME: Update the example with a crate.io package when it's releasable.
-ligen-c = { path = "../../macro" }
+ligen-c = { path = "../../crates/ligen-c" }

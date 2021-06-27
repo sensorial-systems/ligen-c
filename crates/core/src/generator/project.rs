@@ -1,7 +1,7 @@
-use ligen_core::prelude::*;
-use ligen_core::ir::{Attributes, Implementation};
-use ligen_core::generator::{Context, FileSet, FileGenerator};
-use ligen_core::generator::File;
+use ligen::prelude::*;
+use ligen::ir::{Attributes, Implementation};
+use ligen::generator::{Context, FileSet, FileGenerator};
+use ligen::generator::File;
 use std::path::PathBuf;
 
 /// CMake project generator.
@@ -11,7 +11,7 @@ pub struct ProjectGenerator {
     attributes: Attributes
 }
 
-impl ligen_core::generator::Generator for ProjectGenerator {
+impl ligen::generator::Generator for ProjectGenerator {
     fn new(_context: &Context, attributes: &Attributes) -> Self {
         let attributes = attributes.clone();
         Self { attributes }
@@ -28,7 +28,7 @@ impl ligen_core::generator::Generator for ProjectGenerator {
     }
 }
 
-impl ligen_core::generator::FileGenerator for ProjectGenerator {
+impl ligen::generator::FileGenerator for ProjectGenerator {
     fn generate_file_set(&self, context: &Context, file_set: &mut FileSet) {
         let generator_version = env!("CARGO_PKG_VERSION");
         let project_name = &context.arguments.crate_name;
@@ -43,4 +43,4 @@ impl ligen_core::generator::FileGenerator for ProjectGenerator {
     }
 }
 
-impl ligen_core::generator::FFIGenerator for ProjectGenerator {}
+impl ligen::generator::FFIGenerator for ProjectGenerator {}

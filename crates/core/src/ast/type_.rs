@@ -1,4 +1,4 @@
-use ligen_core::ir;
+use ligen::ir;
 
 use crate::ast::Identifier;
 
