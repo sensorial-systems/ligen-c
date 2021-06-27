@@ -1,19 +1,12 @@
 use crate::ast::{Type, Types};
 
 use ligen::ir::Implementation;
-use ligen::ir::ImplementationItem::Constant;
-use ligen::ir::ImplementationItem::Method;
 use ligen::ir;
 use ir::Visibility;
 use ir::Attribute;
 use ir::Attributes;
 use ir::Function;
 use ligen::generator::Context;
-use ligen::utils::Logger;
-
-use std::path::PathBuf;
-use ligen::generator::FileSet;
-use ligen::generator::File;
 
 #[derive(Debug, Copy, Clone)]
 /// Logger struct used for Display in the ligen crates
@@ -92,7 +85,7 @@ impl BindingGenerator {
     }
 
     /// Generate function output.
-    pub fn genrate_function_output(&self, _context: &Context, output: &Option<ir::Type>) -> String {
+    pub fn generate_function_output(&self, _context: &Context, output: &Option<ir::Type>) -> String {
         let type_ = output
             .as_ref()
             .map(|type_| {
@@ -154,7 +147,7 @@ impl BindingGenerator {
     ) -> String {
         let mut content = String::new();
         if let Visibility::Public = method.visibility {
-            content.push_str(&self.genrate_function_output(context, &method.output));
+            content.push_str(&self.generate_function_output(context, &method.output));
             content.push_str(&self.generate_function_name(context, implementation, method));
             content.push('(');
             content.push_str(&self.generate_function_parameters(context, method));
@@ -180,31 +173,5 @@ impl BindingGenerator {
             object_name,
             object_name.to_lowercase()
         )
-    }
-
-    /// generate function for the BindingGenerator
-    pub fn generate(&self, context: &Context, implementation: &Implementation) -> FileSet {
-        let mut content = self.generate_prelude(context);
-        content.push_line(self.generate_struct(context, implementation));
-
-        for item in &implementation.items {
-            match item {
-                Constant(_) => Logger::log("Const extern not supported."),
-                Method(method) => content.push_line(self.generate_function(context, implementation, method)),
-            }
-        }
-
-        content.push_line(BindingGenerator::generate_drop(
-            &implementation.self_.name,
-        ));
-
-        content.push_line(self.generate_epilogue(context));
-
-        let path = PathBuf::from("include")
-            .join(format!("{}.h", implementation.self_.name));
-        let mut file_set = FileSet::new();
-        let file = File::new(path, content);
-        file_set.add(file);
-        file_set
     }
 }
