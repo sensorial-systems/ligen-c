@@ -2,6 +2,6 @@
 members = [
     "crates/core",
     "crates/macro",
-    "crates/ligen-c",
+    "crates/main",
     "examples/counter"
 ]

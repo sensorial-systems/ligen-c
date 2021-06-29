@@ -1,65 +1,157 @@
+use ligen::ir::ImplementationItem;
+use ligen::ir::{Function, Identifier, Parameter, Type};
+use ligen::ir::{Implementation, Visibility};
+use ligen::generator::{Context, FFIGenerator, ImplementationVisitor};
 use ligen::prelude::*;
+use crate::generator::Generator;
 
-#[derive(Debug, Clone, Copy)]
-/// FFI.
-pub struct FFI {}
+#[derive(Debug, Copy, Clone)]
+/// Extern generator.
+pub struct ExternGenerator {}
 
-impl FFI {
-    /// Generates RString code.
-    pub fn generate_rstring() -> TokenStream {
+impl ExternGenerator {
+    /// Generate the function parameters.
+    pub fn generate_parameters(_context: &Context, inputs: &Vec<Parameter>) -> TokenStream {
+        inputs
+            .iter()
+            .fold(TokenStream::new(), |mut tokens, parameter| {
+                let type_ = Self::to_marshal_parameter(&parameter.type_);
+                let identifier = &parameter.identifier;
+                tokens.append_all(quote! {#identifier: #type_,});
+                tokens
+            })
+    }
+
+    /// Generate the function call arguments and its conversions.
+    pub fn generate_arguments(_context: &Context, inputs: &Vec<Parameter>) -> TokenStream {
+        inputs
+            .iter()
+            .fold(TokenStream::new(), |mut tokens, parameter| {
+                let identifier = &parameter.identifier;
+                tokens.append_all(quote! {#identifier.into(),});
+                tokens
+            })
+    }
+
+    /// Marshal type.
+    pub fn to_marshal_output(type_: &Type) -> TokenStream {
+        match type_ {
+            Type::Compound(path) => match path.segments.last().unwrap().name.as_str() {
+                "String" => quote! { *mut crate::ffi::RString },
+                _ => quote! { *mut #type_ },
+            },
+            _ => quote! { #type_ },
+        }
+    }
+
+    /// Marshal type.
+    pub fn to_marshal_parameter(type_: &Type) -> TokenStream {
+        match type_ {
+            Type::Compound(path) => match path.segments.last().unwrap().name.as_str() {
+                "String" => quote! { crate::ffi::CChar },
+                _ => quote! { *mut #type_ },
+            },
+            _ => quote! { #type_ },
+        }
+    }
+
+    /// Generate the function output.
+    pub fn generate_output(_context: &Context, output: &Option<Type>) -> TokenStream {
+        match output {
+            Some(type_) => Self::to_marshal_output(type_),
+            _ => quote! {()},
+        }
+    }
+
+    /// Generate the function
+    pub fn generate_function_signature(
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> TokenStream {
+        let parameters = Self::generate_parameters(context, &method.inputs);
+        let output = Self::generate_output(context, &method.output);
+        let function_name = format!("{}_{}", implementation.self_.name, method.identifier.name);
+        let function_identifier = Identifier::new(&function_name);
         quote! {
-            pub mod ffi {
-                use std::ffi::CStr;
-                use std::os::raw::c_char;
+            #[no_mangle]
+            pub extern fn #function_identifier(#parameters) -> #output
+        }
+    }
 
-                pub struct CChar(*const c_char);
-
-                impl From<CChar> for String {
-                    fn from(cchar: CChar) -> Self {
-                        unsafe { CStr::from_ptr(cchar.0).to_str().unwrap().to_string() }
-                    }
-                }
-
-                pub struct RString(std::ffi::CString);
-
-                #[ligen_c::ligen_c]
-                impl RString {
-                    pub fn new(string: *const c_char) -> Self {
-                        string.into()
-                    }
-
-                    pub fn as_ptr(&self) -> *const c_char {
-                        self.0.as_ptr()
-                    }
-                }
-
-                impl From<String> for RString {
-                    fn from(string: String) -> Self {
-                        let string = std::ffi::CString::new(string).expect("Couldn't create CString.");
-                        Self(string)
-                    }
-                }
-
-                impl From<RString> for String {
-                    fn from(string: RString) -> Self {
-                        string.0.to_string_lossy().to_string()
-                    }
-                }
-
-                impl From<*const c_char> for RString {
-                    fn from(c_char: *const c_char) -> Self {
-                        unsafe {
-                            let string = std::ffi::CString::new(
-                                std::ffi::CStr::from_ptr(c_char)
-                                    .to_string_lossy()
-                                    .to_string(),
-                            )
-                                .expect("Failed to create RString.");
-                            Self(string)
-                        }
-                    }
-                }
+    /// Generate the function
+    pub fn generate_function_block(
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> TokenStream {
+        let arguments = Self::generate_arguments(context, &method.inputs);
+        let self_identifier = &implementation.self_;
+        let method_identifier = &method.identifier;
+        // FIXME: This should be generalized somewhere.
+        let result = if let Some(Type::Compound(_identifier)) = method.output.as_ref() {
+            quote! {
+                Box::into_raw(Box::new(result.into()))
+            }
+        } else {
+            quote! {result}
+        };
+        quote! {
+            {
+                let result = #self_identifier::#method_identifier(#arguments);
+                #result
             }
         }
+    }
+
+    /// Generate an extern function for an implementation method.
+    pub fn generate_function(
+        context: &Context,
+        implementation: &Implementation,
+        method: &Function,
+    ) -> TokenStream {
+        if let Visibility::Public = method.visibility {
+            let function_signature = Self::generate_function_signature(context, implementation, method);
+            let method_block = Self::generate_function_block(context, implementation, method);
+            quote! { #function_signature #method_block }
+        } else {
+            quote! {}
+        }
+    }
+
+    /// Generate drop extern.
+    pub fn generate_drop(object_name: &Identifier) -> TokenStream {
+        let drop_name = Identifier::new(format!("{}_drop", object_name.name).as_str());
+        quote! {
+            #[no_mangle]
+            pub unsafe extern fn #drop_name(object: *mut #object_name) {
+                Box::from_raw(object);
+            }
+        }
+    }
+
+    /// Generate externs for Constants and Methods.
+    pub fn generate(context: &Context, implementation: &Implementation) -> TokenStream {
+        let mut tokens =
+            implementation
+                .items
+                .iter()
+                .fold(TokenStream::new(), |mut tokens, item| {
+                    match item {
+                        ImplementationItem::Constant(_) => unimplemented!("Constants aren't implemented yet."),
+                        ImplementationItem::Method(method) => tokens.append_all(Self::generate_function(context, implementation, method)),
+                    }
+                    tokens
+                });
+        tokens.append_all(ExternGenerator::generate_drop(&implementation.self_));
+        tokens
+    }
+}
+
+impl FFIGenerator for Generator {
+    fn generate_ffi(&self, context: &Context, implementation: Option<&ImplementationVisitor>) -> TokenStream {
+        implementation
+            .map(|implementation| ExternGenerator::generate(context, &implementation.current))
+            .unwrap_or_else(|| TokenStream::new())
     }
 }
