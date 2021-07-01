@@ -1,6 +1,6 @@
 [package]
 name          = "ligen-c-core"
-version       = "0.1.1"
+version       = "0.1.2-alpha.0"
 authors       = ["Danilo Guanabara <danguafer@gmail.com>"]
 edition       = "2018"
 description   = "C binding generator"
@@ -11,5 +11,4 @@ readme        = "../../README.md"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-cargo_toml = "0.9.2"
-ligen      = "0.1.14"
+ligen = "0.1.14"
