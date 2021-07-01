@@ -1,12 +1,15 @@
 [package]
-name    = "ligen-c-macro"
-version = "0.1.0"
-authors = [ "Danilo Guanabara <danguafer@gmail.com>" ]
-edition = "2018"
+name          = "ligen-c-macro"
+version       = "0.1.0"
+authors       = [ "Danilo Guanabara <danguafer@gmail.com>" ]
+edition       = "2018"
+description   = "C binding generator"
+license       = "Apache-2.0"
+documentation = "https://docs.rs/ligen-c"
 
 [lib]
 proc-macro = true
 
 [dependencies]
-ligen-c-core = { path = "../core" }
+ligen-c-core = "0.1.0"
 ligen        = "0.1.13"
