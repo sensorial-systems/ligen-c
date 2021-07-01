@@ -1,5 +1,5 @@
 [package]
-name = "counter"
+name    = "counter"
 version = "0.1.0"
 authors = ["Danilo Guanabara <danilo@sensorial.systems>"]
 edition = "2018"
@@ -10,5 +10,6 @@ edition = "2018"
 crate-type = ["lib","staticlib"]
 
 [dependencies]
-# FIXME: Update the example with a crate.io package when it's releasable.
+ligen = { path = "../../../ligen/crates/main" }
 ligen-c = { path = "../../crates/main" }
+ligen-cmake = { path = "../../../ligen-cmake/crates/main" }

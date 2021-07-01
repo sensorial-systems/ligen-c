@@ -1,11 +1,9 @@
 //! Generator Module
 
 mod ffi;
-mod project;
 mod files;
 
 pub use ffi::*;
-pub use project::*;
 
 use ligen::ir::Attributes;
 use ligen::generator::Context;
