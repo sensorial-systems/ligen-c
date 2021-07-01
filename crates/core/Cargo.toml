@@ -1,8 +1,11 @@
 [package]
-name    = "ligen-c-core"
-version = "0.1.0"
-authors = ["Danilo Guanabara <danguafer@gmail.com>"]
-edition = "2018"
+name          = "ligen-c-core"
+version       = "0.1.0"
+authors       = ["Danilo Guanabara <danguafer@gmail.com>"]
+edition       = "2018"
+description   = "C binding generator"
+license       = "Apache-2.0"
+documentation = "https://docs.rs/ligen-c"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
