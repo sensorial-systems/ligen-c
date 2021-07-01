@@ -11,7 +11,3 @@
 
 pub mod ast;
 pub mod generator;
-
-mod proc_macro;
-pub use ligen_core::proc_macro::{Context, SourceFile};
-pub use proc_macro::{ligen_c, ligen_c_package};

@@ -1,6 +1,7 @@
 #include <Counter.h>
 #include <RString.h>
 #include <Person.h>
+
 #include <stdio.h>
 #include <assert.h>
 #include <string.h>
@@ -15,19 +16,19 @@ int main(int argc, char **argv) {
     assert_eq(Counter_get_count(counter), 3);
     Counter_count(counter, 3);
     assert_eq(Counter_get_count(counter), 6);
-    Counter_destroy(counter);
+    Counter_drop(counter);
 
     RString string = RString_new("Hello!");
     string_assert_eq("Hello!", RString_as_ptr(string));
-    RString_destroy(string);
+    RString_drop(string);
 
     Person person = Person_new("Danilo", "Guanabara");
 
     RString fullName = Person_full_name(person);
     string_assert_eq("Danilo Guanabara", RString_as_ptr(fullName));
-    RString_destroy(fullName);
+    RString_drop(fullName);
 
-    Person_destroy(person);
+    Person_drop(person);
 
     return 0;
 }

@@ -1,7 +1,7 @@
 [package]
-name = "ligen-c"
+name    = "ligen-c-macro"
 version = "0.1.0"
-authors = ["Danilo Guanabara <danguafer@gmail.com>"]
+authors = [ "Danilo Guanabara <danguafer@gmail.com>" ]
 edition = "2018"
 
 [lib]
@@ -9,4 +9,4 @@ proc-macro = true
 
 [dependencies]
 ligen-c-core = { path = "../core" }
-ligen-core = "0.1.12"
+ligen        = "0.1.13"
