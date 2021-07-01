@@ -1,6 +1,6 @@
 [package]
 name          = "ligen-c-macro"
-version       = "0.1.1-alpha.0"
+version       = "0.1.3-alpha.0"
 authors       = [ "Danilo Guanabara <danguafer@gmail.com>" ]
 edition       = "2018"
 description   = "C binding generator"
@@ -12,5 +12,5 @@ readme        = "../../README.md"
 proc-macro = true
 
 [dependencies]
-ligen-c-core = "0.1.1"
+ligen-c-core = "0.1.2"
 ligen        = "0.1.14"
