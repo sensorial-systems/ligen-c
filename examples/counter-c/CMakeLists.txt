@@ -9,6 +9,5 @@ ADD_SUBDIRECTORY(../../target/ligen/counter counter)
 
 AUX_SOURCE_DIRECTORY(src SOURCES)
 
-# INTERFACE is used to create a header-only library.
 ADD_EXECUTABLE(${PROJECT_NAME} ${SOURCES})
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC counter)
