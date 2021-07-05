@@ -1,12 +1,10 @@
 //! Generator Module
 
-mod ffi;
 mod files;
-
-pub use ffi::*;
 
 use ligen::ir::Attributes;
 use ligen::generator::Context;
+use ligen::generator::GenericFFIGenerator;
 
 /// Generator structure.
 #[derive(Clone, Copy, Debug, Default)]
@@ -17,3 +15,5 @@ impl ligen::generator::Generator for Generator {
         Default::default()
     }
 }
+
+impl GenericFFIGenerator for Generator {}

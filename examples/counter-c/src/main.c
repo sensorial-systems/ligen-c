@@ -10,7 +10,7 @@
 #define string_assert_eq(a, b) { printf("assert(\"%s\" == \"%s\")\n", a, b); assert(!strcmp(a, b)); }
 
 int main(int argc, char **argv) {
-    Counter counter = Counter_new(2);
+    CCounter counter = Counter_new(2);
     assert_eq(Counter_get_count(counter), 2);
     Counter_count(counter, 1);
     assert_eq(Counter_get_count(counter), 3);
@@ -18,13 +18,13 @@ int main(int argc, char **argv) {
     assert_eq(Counter_get_count(counter), 6);
     Counter_drop(counter);
 
-    RString string = RString_new("Hello!");
+    CRString string = RString_new("Hello!");
     string_assert_eq("Hello!", RString_as_ptr(string));
     RString_drop(string);
 
-    Person person = Person_new("Danilo", "Guanabara");
+    CPerson person = Person_new("Danilo", "Guanabara");
 
-    RString fullName = Person_full_name(person);
+    CRString fullName = Person_full_name(person);
     string_assert_eq("Danilo Guanabara", RString_as_ptr(fullName));
     RString_drop(fullName);
 
