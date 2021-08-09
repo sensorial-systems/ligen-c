@@ -1,8 +1,16 @@
-use ligen::generator::{ImplementationVisitor, FileProcessorVisitor, Context, FileSet, FunctionVisitor, ParameterVisitor, FileGeneratorVisitors};
+use ligen::generator::{ImplementationVisitor, FileProcessorVisitor, Context, FileSet, FunctionVisitor, ParameterVisitor, FileGeneratorVisitors, StructureVisitor, ObjectVisitor};
 use ligen::ir;
 use std::path::PathBuf;
 use crate::ast::{Types, Type};
 use crate::generator::Generator;
+
+/// Object processor.
+#[derive(Default, Clone, Copy, Debug)]
+pub struct ObjectProcessor;
+
+/// Structure processor.
+#[derive(Default, Clone, Copy, Debug)]
+pub struct StructureProcessor;
 
 /// Implementation processor.
 #[derive(Default, Clone, Copy, Debug)]
@@ -18,6 +26,27 @@ pub struct ParameterProcessor;
 
 fn path(implementation: &ImplementationVisitor) -> PathBuf {
     PathBuf::from("include").join(format!("{}.h", implementation.current.self_.path().last().name))
+}
+
+impl FileProcessorVisitor for ObjectProcessor {
+    type Visitor = ObjectVisitor;
+
+    fn process(&self, _context: &Context, _file_set: &mut FileSet, _visitor: &Self::Visitor) {
+    }
+
+    fn post_process(&self, _context: &Context, _file_set: &mut FileSet, _visitor: &Self::Visitor) {
+    }
+}
+
+
+impl FileProcessorVisitor for StructureProcessor {
+    type Visitor = StructureVisitor;
+
+    fn process(&self, _context: &Context, _file_set: &mut FileSet, _visitor: &Self::Visitor) {
+    }
+
+    fn post_process(&self, _context: &Context, _file_set: &mut FileSet, _visitor: &Self::Visitor) {
+    }
 }
 
 impl FileProcessorVisitor for ImplementationProcessor {
@@ -125,6 +154,8 @@ impl FileProcessorVisitor for ParameterProcessor {
 }
 
 impl FileGeneratorVisitors for Generator {
+    type ObjectProcessor = ObjectProcessor;
+    type StructureProcessor = StructureProcessor;
     type ImplementationProcessor = ImplementationProcessor;
     type FunctionProcessor = FunctionProcessor;
     type ParameterProcessor = ParameterProcessor;

@@ -1,12 +1,7 @@
-use ligen::{ligen, ligen_dependencies};
-use ligen_c::ligen_c;
-use ligen_cmake::ligen_cmake;
-
 pub struct Counter {
     count: u32
 }
 
-#[ligen(c)]
 impl Counter {
     pub fn new(count: u32) -> Self {
         Self { count }
@@ -26,7 +21,6 @@ pub struct Person {
     pub last_name: String
 }
 
-#[ligen(c)]
 impl Person {
     pub fn new(first_name: String, last_name: String) -> Self {
         Self { first_name, last_name }
@@ -36,6 +30,3 @@ impl Person {
         format!("{} {}", self.first_name, self.last_name)
     }
 }
-
-ligen_dependencies!(c);
-ligen_cmake!();
