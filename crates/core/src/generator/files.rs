@@ -17,7 +17,7 @@ pub struct FunctionProcessor;
 pub struct ParameterProcessor;
 
 fn path(implementation: &ImplementationVisitor) -> PathBuf {
-    PathBuf::from("include").join(format!("{}.h", implementation.current.self_.name))
+    PathBuf::from("include").join(format!("{}.h", implementation.current.self_.path().last().name))
 }
 
 impl FileProcessorVisitor for ImplementationProcessor {
@@ -35,16 +35,16 @@ impl FileProcessorVisitor for ImplementationProcessor {
         file.writeln("#endif\n");
 
         // structure
-        file.writeln(format!("typedef struct Struct_{} {{", visitor.current.self_.name));
+        file.writeln(format!("typedef struct Struct_{} {{", visitor.current.self_.path().last().name));
         file.writeln("\tvoid* self;");
-        file.writeln(format!("}} {};", visitor.current.self_.name));
+        file.writeln(format!("}} {};", visitor.current.self_.path().last().name));
     }
 
     fn post_process(&self, _context: &Context, file_set: &mut FileSet, visitor: &Self::Visitor) {
         let file = file_set.entry(&path(&visitor));
 
         // drop function
-        let object_name = &visitor.current.self_.name;
+        let object_name = &visitor.current.self_.path().last().name;
         file.writeln(format!("void {0}_drop({0} {1});", object_name, object_name.to_lowercase()));
 
         // epilogue
@@ -59,7 +59,7 @@ impl FunctionProcessor {
     /// Generate function name.
     pub fn generate_function_name(&self, visitor: &FunctionVisitor) -> String {
         // FIXME: This naming convention happens in the extern generator and here. How can we generalize this code?
-        format!("{}_{}", &visitor.parent.current.self_.name, &visitor.current.identifier.name)
+        format!("{}_{}", &visitor.parent.current.self_.path().segments.last().unwrap().name, &visitor.current.identifier.name)
     }
 
     /// Generate function output.
