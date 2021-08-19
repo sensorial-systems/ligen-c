@@ -1,14 +1,11 @@
-use ligen::ir::Project;
-use ligen::Generator;
-use ligen_c::generator::Generator as CGenerator;
-use ligen_cmake::Generator as CMakeGenerator;
+use ligen::prelude::*;
+use ligen_c::CGenerator;
+use ligen_cmake::{CMakeGenerator, Language};
 
 fn main() {
-    // Project binding generation.
     if let Ok(project) = Project::read() {
-        // Generators.
         let c_generator = CGenerator::default();
-        let cmake_generator = CMakeGenerator::default();
+        let cmake_generator = CMakeGenerator::new(Language::C);
         cmake_generator.generate(&project).expect("Couldn't generate CMake project.");
         c_generator.generate(&project).expect("Couldn't generate C bindings");
     }

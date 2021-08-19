@@ -2,7 +2,7 @@ use ligen::generator::{ImplementationVisitor, FileProcessorVisitor, FileSet, Fun
 use ligen::ir;
 use std::path::PathBuf;
 use crate::ast::{Types, Type};
-use crate::generator::Generator;
+use crate::generator::CGenerator;
 
 /// Project processor.
 #[derive(Default, Clone, Copy, Debug)]
@@ -86,7 +86,6 @@ impl FileProcessorVisitor for ObjectProcessor {
         file.writeln("#endif");
     }
 }
-
 
 impl FileProcessorVisitor for StructureProcessor {
     type Visitor = StructureVisitor;
@@ -177,7 +176,7 @@ impl FileProcessorVisitor for ParameterProcessor {
     }
 }
 
-impl FileGeneratorVisitors for Generator {
+impl FileGeneratorVisitors for CGenerator {
     type ProjectProcessor = ProjectProcessor;
     type ModuleProcessor = ModuleProcessor;
     type ObjectProcessor = ObjectProcessor;

@@ -11,6 +11,6 @@ crate-type = ["lib","staticlib"]
 
 [build-dependencies]
 syn         = "1.0.74"
-ligen       = { path = "../../../ligen/crates/main" }
-ligen-c     = { path = "../../crates/main" }
-ligen-cmake = { path = "../../../ligen-cmake/crates/main" }
+ligen       = { path = "../../../ligen" }
+ligen-c     = { path = "../.." }
+ligen-cmake = { path = "../../../ligen-cmake" }
