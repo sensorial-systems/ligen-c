@@ -33,6 +33,26 @@ pub enum Atomic {
     LongDouble,
 }
 
+impl AsRef<str> for Atomic {
+    fn as_ref(&self) -> &str {
+        match self {
+            Atomic::Char => "char",
+            Atomic::Short => "short",
+            Atomic::Int => "int",
+            Atomic::LongInt => "long int",
+            Atomic::LongLongInt => "long long int",
+            Atomic::Float => "float",
+            Atomic::Double => "double",
+            Atomic::LongDouble => "long double",
+            Atomic::UnsignedChar => "unsigned char",
+            Atomic::UnsignedShort => "unsigned short",
+            Atomic::UnsignedInt => "unsigned int",
+            Atomic::UnsignedLongInt => "unsigned long int",
+            Atomic::UnsignedLongLongInt => "unsigned long long int",
+        }
+    }
+}
+
 #[derive(Debug, PartialEq)]
 /// Types Enum
 pub enum Types {
