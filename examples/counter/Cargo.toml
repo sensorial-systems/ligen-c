@@ -9,7 +9,8 @@ edition = "2018"
 [lib]
 crate-type = ["lib","staticlib"]
 
-[dependencies]
-ligen       = "0.1.13"
-ligen-cmake = "0.1.1"
-ligen-c     = { path = "../../crates/main" }
+[build-dependencies]
+syn         = "1.0.74"
+ligen       = { path = "../../../ligen" }
+ligen-c     = { path = "../.." }
+ligen-cmake = { path = "../../../ligen-cmake" }
